@@ -13,7 +13,9 @@ const ManageProductsPage = () => {
     name: '', description: '', price: '', unit: 'KG', isAvailable: true
   });
 
-  useEffect(() => { fetchProducts(); }, [shopId]);
+useEffect(() => {
+  fetchProducts();
+}, [fetchProducts]);
 
   const fetchProducts = async () => {
     try {

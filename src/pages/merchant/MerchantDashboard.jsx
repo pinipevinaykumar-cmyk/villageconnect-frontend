@@ -15,7 +15,7 @@ const MerchantDashboard = () => {
   useEffect(() => {
     if (!user || user.role !== 'MERCHANT') { navigate('/login'); return; }
     fetchShops();
-  }, []);
+  }, [navigate, user]);
 
   const fetchShops = async () => {
     try {

@@ -15,9 +15,8 @@ const ShopListPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => { fetchCategories(); }, []);
-  useEffect(() => { fetchShops(); }, [village, selectedCategory]);
-
+useEffect(() => { fetchCategories(); }, [fetchCategories]);
+useEffect(() => { fetchShops(); }, [fetchShops, village, selectedCategory]);
   const fetchCategories = async () => {
     try {
       const res = await API.get('/public/categories');

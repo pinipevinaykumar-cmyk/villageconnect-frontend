@@ -10,7 +10,9 @@ const ShopDetailPage = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => { fetchShopDetails(); }, [id]);
+useEffect(() => {
+  fetchShopDetails();
+}, [fetchShopDetails]);
 
   const fetchShopDetails = async () => {
     try {
