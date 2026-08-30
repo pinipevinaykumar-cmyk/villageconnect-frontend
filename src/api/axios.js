@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'https://villageconnect-backend-production.up.railway.app/api',
+baseURL: 'https://villageconnect-backend-dhki.onrender.com/api',
 });
 
 API.interceptors.request.use((config) => {
