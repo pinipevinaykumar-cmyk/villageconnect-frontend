@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-baseURL: 'https://villageconnect-backend-dhki.onrender.com/api',
+  baseURL: `${process.env.REACT_APP_API_URL || 'https://villageconnect-backend-dhki.onrender.com'}/api`,
 });
 
 API.interceptors.request.use((config) => {
