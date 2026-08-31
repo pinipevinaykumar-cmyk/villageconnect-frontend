@@ -13,7 +13,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-green-600 text-white shadow-md sticky top-0 z-50">
+    <nav className="bg-blue-900 text-white shadow-md sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 text-xl font-bold">
           <Store size={24} />
@@ -21,7 +21,7 @@ const Navbar = () => {
         </Link>
         <div className="flex items-center gap-2">
           <Link to="/"
-            className="flex items-center gap-1 bg-green-500 hover:bg-green-400
+            className="flex items-center gap-1 bg-blue-800 hover:bg-blue-700
                        px-3 py-1.5 rounded-lg text-sm font-medium transition">
             <Home size={16} />
             <span className="hidden sm:inline">Home</span>
@@ -31,9 +31,9 @@ const Navbar = () => {
               <span className="text-sm hidden md:block px-1">Hi, {user.name}</span>
               {user.role === 'MERCHANT' && (
                 <Link to="/merchant/dashboard"
-                  className="flex items-center gap-1 bg-white text-green-700
+                  className="flex items-center gap-1 bg-white text-blue-950
                              px-3 py-1.5 rounded-lg text-sm font-semibold
-                             hover:bg-green-50 transition">
+                             hover:bg-blue-50 transition">
                   <LayoutDashboard size={16} />
                   <span className="hidden sm:inline">Dashboard</span>
                 </Link>
@@ -48,19 +48,19 @@ const Navbar = () => {
                 </Link>
               )}
               <button onClick={handleLogout}
-                className="flex items-center gap-1 text-sm hover:text-green-200 px-2">
+                className="flex items-center gap-1 text-sm hover:text-blue-200 px-2">
                 <LogOut size={16} />
                 <span className="hidden sm:inline">Logout</span>
               </button>
             </>
           ) : (
             <>
-              <Link to="/login" className="text-sm hover:text-green-200 px-2">
+              <Link to="/login" className="text-sm hover:text-blue-200 px-2">
                 Login
               </Link>
               <Link to="/register"
-                className="bg-white text-green-700 px-3 py-1.5 rounded-lg
-                           text-sm font-semibold hover:bg-green-50 transition">
+                className="bg-white text-blue-950 px-3 py-1.5 rounded-lg
+                           text-sm font-semibold hover:bg-blue-50 transition">
                 Register
               </Link>
             </>

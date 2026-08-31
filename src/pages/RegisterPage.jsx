@@ -31,7 +31,7 @@ const RegisterPage = () => {
     }
   };
 
-  const inputClass = "w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-500";
+  const inputClass = "w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-800";
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-8">
@@ -48,7 +48,7 @@ const RegisterPage = () => {
                 {['CUSTOMER', 'MERCHANT'].map((r) => (
                   <button key={r} type="button" onClick={() => setForm({ ...form, role: r })}
                     className={`py-2.5 rounded-xl border-2 text-sm font-medium transition
-                      ${form.role === r ? 'border-green-500 bg-green-50 text-green-700'
+                      ${form.role === r ? 'border-blue-800 bg-blue-50 text-blue-950'
                                         : 'border-gray-200 text-gray-600'}`}>
                     {r === 'CUSTOMER' ? '👤 Customer' : '🏪 Shop Owner'}
                   </button>
@@ -65,15 +65,15 @@ const RegisterPage = () => {
                    onChange={handleChange} required placeholder="Password (min 6 chars)"
                    className={inputClass} />
             <button type="submit" disabled={loading}
-              className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold
-                         hover:bg-green-700 transition disabled:opacity-50">
+              className="w-full bg-blue-900 text-white py-3 rounded-xl font-semibold
+                         hover:bg-blue-950 transition disabled:opacity-50">
               {loading ? 'Creating...' : 'Create Account'}
             </button>
           </form>
         </div>
         <p className="text-center text-sm text-gray-600 mt-5">
           Already have an account?{' '}
-          <Link to="/login" className="text-green-600 font-semibold">Login</Link>
+          <Link to="/login" className="text-blue-900 font-semibold">Login</Link>
         </p>
       </div>
     </div>

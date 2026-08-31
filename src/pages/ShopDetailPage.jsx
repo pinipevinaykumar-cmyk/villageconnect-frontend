@@ -34,12 +34,12 @@ const ShopDetailPage = () => {
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
       <button onClick={() => navigate(-1)}
-        className="flex items-center gap-2 text-gray-500 hover:text-green-600
+        className="flex items-center gap-2 text-gray-500 hover:text-blue-900
                    mb-4 text-sm font-medium transition">
         <ArrowLeft size={18} /> Back
       </button>
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-5">
-        <div className="w-full h-40 bg-green-50 flex items-center justify-center text-6xl">
+        <div className="w-full h-40 bg-blue-50 flex items-center justify-center text-6xl">
           {shop.imageUrl
             ? <img src={shop.imageUrl} alt={shop.name} className="w-full h-full object-cover" />
             : <span>{shop.category?.icon || '🏪'}</span>
@@ -52,7 +52,7 @@ const ShopDetailPage = () => {
               <p className="text-sm text-gray-500">{shop.category?.name}</p>
             </div>
             <span className={`text-sm font-bold px-3 py-1.5 rounded-full
-              ${isOpen ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
+              ${isOpen ? 'bg-blue-100 text-blue-950' : 'bg-red-100 text-red-600'}`}>
               {isOpen ? '🟢 OPEN NOW' : '🔴 CLOSED'}
             </span>
           </div>
@@ -78,8 +78,8 @@ const ShopDetailPage = () => {
               <Phone size={20} /><span className="text-xs font-medium">Call</span>
             </button>
             <button onClick={() => window.open(`https://wa.me/91${shop.whatsapp || shop.phone}`)}
-              className="flex flex-col items-center gap-1 py-3 bg-green-50 text-green-600
-                         rounded-xl hover:bg-green-100 transition">
+              className="flex flex-col items-center gap-1 py-3 bg-blue-50 text-blue-900
+                         rounded-xl hover:bg-blue-100 transition">
               <MessageCircle size={20} /><span className="text-xs font-medium">WhatsApp</span>
             </button>
             <button onClick={() => window.open(`https://www.google.com/maps/search/${encodeURIComponent(shop.name + ' ' + shop.village)}`)}
@@ -107,13 +107,13 @@ const ShopDetailPage = () => {
                     <p className="text-xs text-gray-500 mt-0.5">{product.description}</p>
                   )}
                   <span className={`text-xs mt-1 inline-block px-2 py-0.5 rounded-full
-                    ${product.isAvailable ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'}`}>
+                    ${product.isAvailable ? 'bg-blue-100 text-blue-900' : 'bg-gray-100 text-gray-500'}`}>
                     {product.isAvailable ? 'Available' : 'Not available'}
                   </span>
                 </div>
                 {product.price && (
                   <div className="text-right">
-                    <p className="text-lg font-bold text-green-600">₹{product.price}</p>
+                    <p className="text-lg font-bold text-blue-900">₹{product.price}</p>
                     {product.unit && <p className="text-xs text-gray-500">per {product.unit}</p>}
                   </div>
                 )}

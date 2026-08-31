@@ -9,7 +9,7 @@ const ShopCard = ({ shop }) => {
     <Link to={`/shops/${shop.id}`}>
       <div className="bg-white rounded-xl shadow-sm border border-gray-100
                       hover:shadow-md transition p-4 flex flex-col gap-3">
-        <div className="w-full h-32 bg-green-50 rounded-lg flex items-center
+        <div className="w-full h-32 bg-blue-50 rounded-lg flex items-center
                         justify-center text-4xl overflow-hidden">
           {shop.imageUrl ? (
             <img src={shop.imageUrl} alt={shop.name}
@@ -22,7 +22,7 @@ const ShopCard = ({ shop }) => {
           <div className="flex items-start justify-between gap-2">
             <h3 className="font-semibold text-gray-800 text-sm">{shop.name}</h3>
             <span className={`text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap
-              ${isOpen ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
+              ${isOpen ? 'bg-blue-100 text-blue-950' : 'bg-red-100 text-red-600'}`}>
               {isOpen ? '🟢 OPEN' : '🔴 CLOSED'}
             </span>
           </div>

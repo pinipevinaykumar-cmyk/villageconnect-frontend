@@ -6,7 +6,7 @@ const CategoryCard = ({ category, isSelected, onClick }) => {
       className={`flex flex-col items-center gap-1 p-3 rounded-xl border-2
                   transition min-w-[72px]
                   ${isSelected
-                    ? 'border-green-500 bg-green-50 text-green-700'
+                    ? 'border-blue-800 bg-blue-50 text-blue-950'
                     : 'border-gray-200 bg-white text-gray-600 hover:border-green-300'
                   }`}>
       <span className="text-2xl">{category.icon}</span>

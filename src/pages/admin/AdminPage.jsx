@@ -60,7 +60,7 @@ const AdminPage = () => {
 
   const tabClass = (t) =>
     `px-4 py-2 text-sm font-medium rounded-lg transition ${
-      tab === t ? 'bg-green-600 text-white' : 'text-gray-600 hover:bg-gray-100'
+      tab === t ? 'bg-blue-900 text-white' : 'text-gray-600 hover:bg-gray-100'
     }`;
 
   if (!user || user.role !== 'ADMIN') return null;
@@ -68,7 +68,7 @@ const AdminPage = () => {
   return (
     <div className="max-w-6xl mx-auto px-4 py-6">
       <button onClick={() => navigate('/')}
-        className="flex items-center gap-2 text-gray-500 hover:text-green-600 mb-4 text-sm font-medium">
+        className="flex items-center gap-2 text-gray-500 hover:text-blue-900 mb-4 text-sm font-medium">
         <ArrowLeft size={18} /> Back to Home
       </button>
 
@@ -79,7 +79,7 @@ const AdminPage = () => {
           <StatCard icon={Users}    label="Total Users"    value={stats.totalUsers}     color="bg-blue-500" />
           <StatCard icon={Users}    label="Merchants"      value={stats.totalMerchants}  color="bg-purple-500" />
           <StatCard icon={Users}    label="Customers"      value={stats.totalCustomers}  color="bg-indigo-400" />
-          <StatCard icon={Store}    label="Total Shops"    value={stats.totalShops}      color="bg-green-500" />
+          <StatCard icon={Store}    label="Total Shops"    value={stats.totalShops}      color="bg-blue-800" />
           <StatCard icon={Store}    label="Open Now"       value={stats.openShops}       color="bg-emerald-500" />
           <StatCard icon={Package}  label="Products"       value={stats.totalProducts}   color="bg-orange-500" />
         </div>
@@ -131,7 +131,7 @@ const AdminPage = () => {
                     </td>
                     <td className="px-4 py-3">
                       <button onClick={() => toggleUser(u.id)}
-                        className={`transition ${u.isActive ? 'text-green-500 hover:text-red-400' : 'text-gray-400 hover:text-green-500'}`}>
+                        className={`transition ${u.isActive ? 'text-blue-800 hover:text-red-400' : 'text-gray-400 hover:text-blue-800'}`}>
                         {u.isActive ? <ToggleRight size={22} /> : <ToggleLeft size={22} />}
                       </button>
                     </td>
@@ -166,7 +166,7 @@ const AdminPage = () => {
                     <td className="px-4 py-3 text-gray-600">{s.category?.name || '—'}</td>
                     <td className="px-4 py-3">
                       <span className={`px-2 py-0.5 rounded-full text-xs font-semibold
-                        ${s.currentStatus === 'OPEN' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
+                        ${s.currentStatus === 'OPEN' ? 'bg-blue-100 text-blue-950' : 'bg-red-100 text-red-600'}`}>
                         {s.currentStatus}
                       </span>
                     </td>

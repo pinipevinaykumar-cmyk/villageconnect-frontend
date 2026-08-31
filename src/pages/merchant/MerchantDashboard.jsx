@@ -43,8 +43,8 @@ const MerchantDashboard = () => {
           <p className="text-sm text-gray-500">Welcome, {user?.name}</p>
         </div>
         <Link to="/merchant/add-shop"
-          className="flex items-center gap-2 bg-green-600 text-white px-4 py-2.5
-                     rounded-xl text-sm font-semibold hover:bg-green-700 transition">
+          className="flex items-center gap-2 bg-blue-900 text-white px-4 py-2.5
+                     rounded-xl text-sm font-semibold hover:bg-blue-950 transition">
           <Plus size={16} /> Add Shop
         </Link>
       </div>
@@ -55,8 +55,8 @@ const MerchantDashboard = () => {
           <h2 className="text-lg font-semibold text-gray-800 mb-2">No shops yet</h2>
           <p className="text-sm text-gray-500 mb-5">Add your first shop!</p>
           <Link to="/merchant/add-shop"
-            className="bg-green-600 text-white px-6 py-2.5 rounded-xl font-semibold
-                       hover:bg-green-700 transition">
+            className="bg-blue-900 text-white px-6 py-2.5 rounded-xl font-semibold
+                       hover:bg-blue-950 transition">
             Add Your Shop
           </Link>
         </div>
@@ -75,7 +75,7 @@ const MerchantDashboard = () => {
                     </p>
                   </div>
                   <span className={`text-sm font-bold px-3 py-1 rounded-full
-                    ${isOpen ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
+                    ${isOpen ? 'bg-blue-100 text-blue-950' : 'bg-red-100 text-red-600'}`}>
                     {isOpen ? '🟢 OPEN' : '🔴 CLOSED'}
                   </span>
                 </div>
@@ -89,7 +89,7 @@ const MerchantDashboard = () => {
                     className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm
                                 font-semibold transition
                                 ${isOpen ? 'bg-red-50 text-red-600 hover:bg-red-100'
-                                         : 'bg-green-50 text-green-600 hover:bg-green-100'}`}>
+                                         : 'bg-blue-50 text-blue-900 hover:bg-blue-100'}`}>
                     {isOpen ? <><ToggleRight size={16} /> Mark Closed</>
                              : <><ToggleLeft size={16} /> Mark Open</>}
                   </button>

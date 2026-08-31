@@ -45,25 +45,25 @@ const LoginPage = () => {
               <input type="text" name="emailOrPhone" value={form.emailOrPhone}
                      onChange={handleChange} placeholder="9999999999 or email" required
                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm
-                                focus:outline-none focus:border-green-500" />
+                                focus:outline-none focus:border-blue-800" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
               <input type="password" name="password" value={form.password}
                      onChange={handleChange} placeholder="Enter password" required
                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm
-                                focus:outline-none focus:border-green-500" />
+                                focus:outline-none focus:border-blue-800" />
             </div>
             <button type="submit" disabled={loading}
-              className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold
-                         hover:bg-green-700 transition disabled:opacity-50">
+              className="w-full bg-blue-900 text-white py-3 rounded-xl font-semibold
+                         hover:bg-blue-950 transition disabled:opacity-50">
               {loading ? 'Logging in...' : 'Login'}
             </button>
           </form>
         </div>
         <p className="text-center text-sm text-gray-600 mt-5">
           Don't have an account?{' '}
-          <Link to="/register" className="text-green-600 font-semibold">Register</Link>
+          <Link to="/register" className="text-blue-900 font-semibold">Register</Link>
         </p>
       </div>
     </div>

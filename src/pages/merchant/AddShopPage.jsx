@@ -39,7 +39,7 @@ const AddShopPage = () => {
     } finally { setLoading(false); }
   };
 
-  const inputClass = "w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-500";
+  const inputClass = "w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-800";
   const labelClass = "block text-sm font-medium text-gray-700 mb-1";
   const sectionClass = "bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4";
 
@@ -115,7 +115,7 @@ const AddShopPage = () => {
           <h2 className="font-semibold text-gray-700">Shop Timings</h2>
           <label className="flex items-center gap-3 cursor-pointer">
             <input type="checkbox" name="is24Hours" checked={form.is24Hours}
-                   onChange={handleChange} className="w-4 h-4 accent-green-600" />
+                   onChange={handleChange} className="w-4 h-4 accent-blue-900" />
             <span className="text-sm text-gray-700">Open 24 Hours</span>
           </label>
           {!form.is24Hours && (
@@ -135,14 +135,14 @@ const AddShopPage = () => {
           <label className="flex items-center gap-3 cursor-pointer">
             <input type="checkbox" name="isDeliveryAvailable"
                    checked={form.isDeliveryAvailable} onChange={handleChange}
-                   className="w-4 h-4 accent-green-600" />
+                   className="w-4 h-4 accent-blue-900" />
             <span className="text-sm text-gray-700">Delivery Available</span>
           </label>
         </div>
 
         <button type="submit" disabled={loading}
-          className="w-full bg-green-600 text-white py-4 rounded-xl font-bold
-                     text-base hover:bg-green-700 transition disabled:opacity-50">
+          className="w-full bg-blue-900 text-white py-4 rounded-xl font-bold
+                     text-base hover:bg-blue-950 transition disabled:opacity-50">
           {loading ? 'Adding shop...' : '🏪 Add Shop'}
         </button>
       </form>

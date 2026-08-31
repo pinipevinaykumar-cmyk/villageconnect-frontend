@@ -52,7 +52,7 @@ const ShopListPage = () => {
     <div className="max-w-4xl mx-auto px-4 py-6">
       <div className="mb-5">
         <button onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-gray-500 hover:text-green-600
+          className="flex items-center gap-2 text-gray-500 hover:text-blue-900
                      mb-3 text-sm font-medium transition">
           <ArrowLeft size={18} /> Back
         </button>
@@ -66,11 +66,11 @@ const ShopListPage = () => {
           <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
                  placeholder="Search shops..."
                  className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm
-                            focus:outline-none focus:border-green-500" />
+                            focus:outline-none focus:border-blue-800" />
         </div>
         <button type="submit"
-          className="bg-green-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium
-                     hover:bg-green-700 transition">
+          className="bg-blue-900 text-white px-4 py-2.5 rounded-xl text-sm font-medium
+                     hover:bg-blue-950 transition">
           Search
         </button>
       </form>
@@ -78,7 +78,7 @@ const ShopListPage = () => {
       <div className="flex gap-2 overflow-x-auto pb-2 mb-5">
         <button onClick={() => setSelectedCategory(null)}
           className={`flex flex-col items-center gap-1 p-3 rounded-xl border-2 transition min-w-[72px]
-            ${!selectedCategory ? 'border-green-500 bg-green-50 text-green-700'
+            ${!selectedCategory ? 'border-blue-800 bg-blue-50 text-blue-950'
                                 : 'border-gray-200 bg-white text-gray-600'}`}>
           <span className="text-2xl">🏪</span>
           <span className="text-xs font-medium">All</span>
