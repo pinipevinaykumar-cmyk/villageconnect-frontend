@@ -11,6 +11,7 @@ import RegisterPage from './pages/RegisterPage';
 import MerchantDashboard from './pages/merchant/MerchantDashboard';
 import AddShopPage from './pages/merchant/AddShopPage';
 import ManageProductsPage from './pages/merchant/ManageProductsPage';
+import AdminPage from './pages/admin/AdminPage';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
             <Route path="/merchant/add-shop" element={<AddShopPage />} />
             <Route path="/merchant/shops/:shopId/products"
                    element={<ManageProductsPage />} />
+            <Route path="/admin" element={<AdminPage />} />
           </Routes>
         </div>
       </Router>

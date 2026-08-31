@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Store, LogOut, LayoutDashboard, Home } from 'lucide-react';
+import { Store, LogOut, LayoutDashboard, Home, ShieldCheck } from 'lucide-react';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -36,6 +36,15 @@ const Navbar = () => {
                              hover:bg-green-50 transition">
                   <LayoutDashboard size={16} />
                   <span className="hidden sm:inline">Dashboard</span>
+                </Link>
+              )}
+              {user.role === 'ADMIN' && (
+                <Link to="/admin"
+                  className="flex items-center gap-1 bg-white text-red-600
+                             px-3 py-1.5 rounded-lg text-sm font-semibold
+                             hover:bg-red-50 transition">
+                  <ShieldCheck size={16} />
+                  <span className="hidden sm:inline">Admin</span>
                 </Link>
               )}
               <button onClick={handleLogout}
