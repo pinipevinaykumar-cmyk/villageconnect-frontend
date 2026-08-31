@@ -10,21 +10,20 @@ const ShopDetailPage = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-useEffect(() => {
-  fetchShopDetails();
-}, [fetchShopDetails]);
-
-  const fetchShopDetails = async () => {
-    try {
-      const [shopRes, productsRes] = await Promise.all([
-        API.get(`/public/shops/${id}`),
-        API.get(`/public/shops/${id}/products`)
-      ]);
-      setShop(shopRes.data.data);
-      setProducts(productsRes.data.data);
-    } catch (err) { console.error(err); }
-    finally { setLoading(false); }
-  };
+  useEffect(() => {
+    const fetchShopDetails = async () => {
+      try {
+        const [shopRes, productsRes] = await Promise.all([
+          API.get(`/public/shops/${id}`),
+          API.get(`/public/shops/${id}/products`)
+        ]);
+        setShop(shopRes.data.data);
+        setProducts(productsRes.data.data);
+      } catch (err) { console.error(err); }
+      finally { setLoading(false); }
+    };
+    fetchShopDetails();
+  }, [id]);
 
   if (loading) return <LoadingSpinner />;
   if (!shop) return <div className="text-center py-20 text-gray-500">Shop not found</div>;

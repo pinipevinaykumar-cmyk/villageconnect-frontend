@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import API from '../api/axios';
@@ -15,16 +15,14 @@ const ShopListPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
 
-useEffect(() => { fetchCategories(); }, [fetchCategories]);
-useEffect(() => { fetchShops(); }, [fetchShops, village, selectedCategory]);
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       const res = await API.get('/public/categories');
       setCategories(res.data.data);
     } catch (err) { console.error(err); }
-  };
+  }, []);
 
-  const fetchShops = async () => {
+  const fetchShops = useCallback(async () => {
     setLoading(true);
     try {
       const params = { village };
@@ -33,7 +31,10 @@ useEffect(() => { fetchShops(); }, [fetchShops, village, selectedCategory]);
       setShops(res.data.data);
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
-  };
+  }, [village, selectedCategory]);
+
+  useEffect(() => { fetchCategories(); }, [fetchCategories]);
+  useEffect(() => { fetchShops(); }, [fetchShops]);
 
   const handleSearch = async (e) => {
     e.preventDefault();

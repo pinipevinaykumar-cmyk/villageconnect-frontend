@@ -25,7 +25,7 @@ const RegisterPage = () => {
       if (userData.role === 'MERCHANT') navigate('/merchant/add-shop');
       else navigate('/');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Registration failed');
+      toast.error(err.response?.data?.message || 'Registration failed. Server may be starting up — please try again in 30 seconds.');
     } finally {
       setLoading(false);
     }
