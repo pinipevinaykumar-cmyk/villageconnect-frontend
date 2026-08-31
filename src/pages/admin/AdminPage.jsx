@@ -27,7 +27,7 @@ const AdminPage = () => {
 
   useEffect(() => {
     if (!user || user.role !== 'ADMIN') {
-      navigate('/');
+      navigate('/home');
     }
   }, [user, navigate]);
 
@@ -67,7 +67,7 @@ const AdminPage = () => {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-6">
-      <button onClick={() => navigate('/')}
+      <button onClick={() => navigate('/home')}
         className="flex items-center gap-2 text-gray-500 hover:text-blue-900 mb-4 text-sm font-medium">
         <ArrowLeft size={18} /> Back to Home
       </button>

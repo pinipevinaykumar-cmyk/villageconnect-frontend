@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const LandingPage = () => {
@@ -7,10 +7,9 @@ const LandingPage = () => {
   const { user } = useAuth();
 
   if (user) {
-    if (user.role === 'ADMIN') navigate('/admin');
-    else if (user.role === 'MERCHANT') navigate('/merchant/dashboard');
-    else navigate('/home');
-    return null;
+    if (user.role === 'ADMIN') return <Navigate to="/admin" replace />;
+    if (user.role === 'MERCHANT') return <Navigate to="/merchant/dashboard" replace />;
+    return <Navigate to="/home" replace />;
   }
 
   return (
