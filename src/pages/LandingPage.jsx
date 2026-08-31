@@ -18,8 +18,8 @@ const LandingPage = () => {
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-12 text-white text-center">
         <div className="text-6xl mb-4">🏘️</div>
         <h1 className="text-3xl font-bold mb-2">VillageConnect</h1>
-        <p className="text-blue-200 text-lg mb-2">మన ఊరు, మన షాపులు</p>
-        <p className="text-blue-300 text-sm mb-12">Find shops in your village — know who's open right now</p>
+        <p className="text-blue-100 text-lg font-medium mb-2">Your village. Your people. Your shops.</p>
+        <p className="text-blue-300 text-sm mb-12">Know who's open right now, right in your village</p>
 
         <p className="text-blue-100 font-semibold text-lg mb-6">I am a...</p>
 

@@ -17,9 +17,9 @@ const HomePage = () => {
     <div className="min-h-screen bg-gradient-to-b from-blue-900 to-blue-950">
       <div className="max-w-2xl mx-auto px-4 py-16 text-center text-white">
         <div className="text-5xl mb-4">🏘️</div>
-        <h1 className="text-3xl font-bold mb-2">మన ఊరు, మన షాపులు</h1>
+        <h1 className="text-3xl font-bold mb-2">VillageConnect</h1>
         <p className="text-blue-100 mb-8 text-lg">
-          Find shops in your village — know who's open right now
+          Your village. Your people. Your shops.
         </p>
         <div className="bg-white rounded-2xl p-5 shadow-xl">
           <p className="text-gray-600 text-sm mb-3 font-medium">Select your village</p>

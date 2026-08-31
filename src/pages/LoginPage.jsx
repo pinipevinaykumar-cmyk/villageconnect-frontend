@@ -36,7 +36,7 @@ const LoginPage = () => {
         <div className="text-center mb-8">
           <div className="text-4xl mb-2">🏘️</div>
           <h1 className="text-2xl font-bold text-gray-800">Welcome back</h1>
-          <p className="text-gray-500 text-sm mt-1">Login to ManaOoru</p>
+          <p className="text-gray-500 text-sm mt-1">Your village. Your people. Your shops.</p>
         </div>
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <form onSubmit={handleSubmit} className="space-y-4">
