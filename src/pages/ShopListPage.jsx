@@ -51,10 +51,10 @@ const ShopListPage = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 py-6">
       <div className="mb-5">
-        <button onClick={() => navigate('/')}
+        <button onClick={() => navigate(-1)}
           className="flex items-center gap-2 text-gray-500 hover:text-green-600
                      mb-3 text-sm font-medium transition">
-          <ArrowLeft size={18} /> Back to Home
+          <ArrowLeft size={18} /> Back
         </button>
         <h1 className="text-xl font-bold text-gray-800">📍 {village}</h1>
         <p className="text-sm text-gray-500">{shops.length} shops found</p>
