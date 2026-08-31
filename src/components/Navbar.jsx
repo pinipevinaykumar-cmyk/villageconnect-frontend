@@ -20,7 +20,7 @@ const Navbar = () => {
           <span className="hidden sm:inline">VillageConnect</span>
         </Link>
         <div className="flex items-center gap-2">
-          <Link to="/"
+          <Link to={user ? '/home' : '/'}
             className="flex items-center gap-1 bg-blue-800 hover:bg-blue-700
                        px-3 py-1.5 rounded-lg text-sm font-medium transition">
             <Home size={16} />

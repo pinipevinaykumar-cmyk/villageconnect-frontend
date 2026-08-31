@@ -22,7 +22,7 @@ const LoginPage = () => {
       toast.success(`Welcome back, ${userData.name}!`);
       if (userData.role === 'MERCHANT') navigate('/merchant/dashboard');
       else if (userData.role === 'ADMIN') navigate('/admin');
-      else navigate('/');
+      else navigate('/home');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Login failed');
     } finally {

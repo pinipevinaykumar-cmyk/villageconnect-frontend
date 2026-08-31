@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import API from '../api/axios';
 
 const RegisterPage = () => {
+  const [searchParams] = useSearchParams();
+  const initialRole = searchParams.get('role') === 'MERCHANT' ? 'MERCHANT' : 'CUSTOMER';
   const [form, setForm] = useState({
-    name: '', email: '', phone: '', password: '', role: 'CUSTOMER', village: 'Pandalapaka'
+    name: '', email: '', phone: '', password: '', role: initialRole, village: 'Pandalapaka'
   });
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -23,7 +25,7 @@ const RegisterPage = () => {
       login(userData, token);
       toast.success('Account created successfully!');
       if (userData.role === 'MERCHANT') navigate('/merchant/add-shop');
-      else navigate('/');
+      else navigate('/home');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Registration failed. Server may be starting up — please try again in 30 seconds.');
     } finally {
