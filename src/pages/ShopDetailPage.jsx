@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { Phone, MessageCircle, MapPin, Clock, Package } from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Phone, MessageCircle, MapPin, Clock, Package, ArrowLeft } from 'lucide-react';
 import API from '../api/axios';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 const ShopDetailPage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [shop, setShop] = useState(null);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -32,6 +33,11 @@ const ShopDetailPage = () => {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
+      <button onClick={() => navigate(-1)}
+        className="flex items-center gap-2 text-gray-500 hover:text-green-600
+                   mb-4 text-sm font-medium transition">
+        <ArrowLeft size={18} /> Back
+      </button>
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-5">
         <div className="w-full h-40 bg-green-50 flex items-center justify-center text-6xl">
           {shop.imageUrl

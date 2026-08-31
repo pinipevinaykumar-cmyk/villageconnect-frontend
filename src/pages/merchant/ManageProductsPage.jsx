@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import { Plus, Trash2, Edit } from 'lucide-react';
+import { Plus, Trash2, Edit, ArrowLeft } from 'lucide-react';
 import API from '../../api/axios';
 
 const ManageProductsPage = () => {
   const { shopId } = useParams();
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editProduct, setEditProduct] = useState(null);
@@ -66,6 +67,11 @@ const ManageProductsPage = () => {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
+      <button onClick={() => navigate('/merchant/dashboard')}
+        className="flex items-center gap-2 text-gray-500 hover:text-green-600
+                   mb-4 text-sm font-medium transition">
+        <ArrowLeft size={18} /> Back to Dashboard
+      </button>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-bold text-gray-800">Manage Products</h1>
         <button onClick={() => { resetForm(); setShowForm(!showForm); }}

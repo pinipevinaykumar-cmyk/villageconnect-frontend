@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { Search } from 'lucide-react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { Search, ArrowLeft } from 'lucide-react';
 import API from '../api/axios';
 import ShopCard from '../components/ShopCard';
 import CategoryCard from '../components/CategoryCard';
@@ -8,6 +8,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 
 const ShopListPage = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const village = searchParams.get('village') || 'Pandalapaka';
   const [shops, setShops] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -50,6 +51,11 @@ const ShopListPage = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 py-6">
       <div className="mb-5">
+        <button onClick={() => navigate('/')}
+          className="flex items-center gap-2 text-gray-500 hover:text-green-600
+                     mb-3 text-sm font-medium transition">
+          <ArrowLeft size={18} /> Back to Home
+        </button>
         <h1 className="text-xl font-bold text-gray-800">📍 {village}</h1>
         <p className="text-sm text-gray-500">{shops.length} shops found</p>
       </div>
