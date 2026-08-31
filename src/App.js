@@ -12,6 +12,7 @@ import MerchantDashboard from './pages/merchant/MerchantDashboard';
 import AddShopPage from './pages/merchant/AddShopPage';
 import ManageProductsPage from './pages/merchant/ManageProductsPage';
 import AdminPage from './pages/admin/AdminPage';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -21,16 +22,15 @@ function App() {
           <Navbar />
           <Toaster position="top-center" />
           <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/shops" element={<ShopListPage />} />
-            <Route path="/shops/:id" element={<ShopDetailPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
-            <Route path="/merchant/dashboard" element={<MerchantDashboard />} />
-            <Route path="/merchant/add-shop" element={<AddShopPage />} />
-            <Route path="/merchant/shops/:shopId/products"
-                   element={<ManageProductsPage />} />
-            <Route path="/admin" element={<AdminPage />} />
+            <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+            <Route path="/shops" element={<ProtectedRoute><ShopListPage /></ProtectedRoute>} />
+            <Route path="/shops/:id" element={<ProtectedRoute><ShopDetailPage /></ProtectedRoute>} />
+            <Route path="/merchant/dashboard" element={<ProtectedRoute requiredRole="MERCHANT"><MerchantDashboard /></ProtectedRoute>} />
+            <Route path="/merchant/add-shop" element={<ProtectedRoute requiredRole="MERCHANT"><AddShopPage /></ProtectedRoute>} />
+            <Route path="/merchant/shops/:shopId/products" element={<ProtectedRoute requiredRole="MERCHANT"><ManageProductsPage /></ProtectedRoute>} />
+            <Route path="/admin" element={<ProtectedRoute requiredRole="ADMIN"><AdminPage /></ProtectedRoute>} />
           </Routes>
         </div>
       </Router>
