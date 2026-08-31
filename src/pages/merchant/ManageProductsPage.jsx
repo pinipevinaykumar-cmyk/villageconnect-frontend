@@ -13,16 +13,15 @@ const ManageProductsPage = () => {
     name: '', description: '', price: '', unit: 'KG', isAvailable: true
   });
 
-useEffect(() => {
-  fetchProducts();
-}, [fetchProducts]);
-
-  const fetchProducts = async () => {
-    try {
-      const res = await API.get(`/public/shops/${shopId}/products`);
-      setProducts(res.data.data);
-    } catch (err) { toast.error('Failed to load products'); }
-  };
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await API.get(`/public/shops/${shopId}/products`);
+        setProducts(res.data.data);
+      } catch (err) { toast.error('Failed to load products'); }
+    };
+    fetchProducts();
+  }, [shopId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
