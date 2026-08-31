@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import API from '../../api/axios';
-import { Users, Store, Package, BarChart2, ArrowLeft, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Users, Store, Package, ArrowLeft, ToggleLeft, ToggleRight } from 'lucide-react';
 
 const StatCard = ({ icon: Icon, label, value, color }) => (
   <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center gap-4">
