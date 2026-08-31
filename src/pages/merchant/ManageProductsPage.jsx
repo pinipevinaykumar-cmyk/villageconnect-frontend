@@ -63,20 +63,20 @@ const ManageProductsPage = () => {
     setShowForm(false);
   };
 
-  const inputClass = "w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-500";
+  const inputClass = "w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-800";
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
       <button onClick={() => navigate('/merchant/dashboard')}
-        className="flex items-center gap-2 text-gray-500 hover:text-green-600
+        className="flex items-center gap-2 text-gray-500 hover:text-blue-900
                    mb-4 text-sm font-medium transition">
         <ArrowLeft size={18} /> Back to Dashboard
       </button>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-bold text-gray-800">Manage Products</h1>
         <button onClick={() => { resetForm(); setShowForm(!showForm); }}
-          className="flex items-center gap-2 bg-green-600 text-white px-4 py-2
-                     rounded-xl text-sm font-semibold hover:bg-green-700">
+          className="flex items-center gap-2 bg-blue-900 text-white px-4 py-2
+                     rounded-xl text-sm font-semibold hover:bg-blue-950">
           <Plus size={16} /> Add Product
         </button>
       </div>
@@ -108,13 +108,13 @@ const ManageProductsPage = () => {
             <label className="flex items-center gap-2 text-sm text-gray-700">
               <input type="checkbox" checked={form.isAvailable}
                      onChange={e => setForm({ ...form, isAvailable: e.target.checked })}
-                     className="accent-green-600" />
+                     className="accent-blue-900" />
               Currently available
             </label>
             <div className="flex gap-3">
               <button type="submit"
-                className="flex-1 bg-green-600 text-white py-2.5 rounded-xl font-semibold
-                           hover:bg-green-700">
+                className="flex-1 bg-blue-900 text-white py-2.5 rounded-xl font-semibold
+                           hover:bg-blue-950">
                 {editProduct ? 'Update' : 'Add Product'}
               </button>
               <button type="button" onClick={resetForm}
@@ -145,12 +145,12 @@ const ManageProductsPage = () => {
                 )}
                 <div className="flex items-center gap-2 mt-1">
                   {product.price && (
-                    <span className="text-green-600 font-bold text-sm">
+                    <span className="text-blue-900 font-bold text-sm">
                       ₹{product.price}/{product.unit}
                     </span>
                   )}
                   <span className={`text-xs px-2 py-0.5 rounded-full
-                    ${product.isAvailable ? 'bg-green-100 text-green-600'
+                    ${product.isAvailable ? 'bg-blue-100 text-blue-900'
                                           : 'bg-gray-100 text-gray-500'}`}>
                     {product.isAvailable ? 'Available' : 'Unavailable'}
                   </span>
