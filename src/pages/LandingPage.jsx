@@ -348,96 +348,93 @@ const LandingPage = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden">
+    <div style={{ minHeight: '100vh', position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
       <VillageBg />
 
-      {/* Main content */}
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-12 text-center">
-
-        {/* Title floats above card over the sky */}
-        <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 58, filter: 'drop-shadow(0 4px 10px rgba(0,0,0,0.35))' }}>🏘️</div>
-          <h1 style={{ fontSize: 32, fontWeight: 900, color: 'white', marginBottom: 4,
-                       textShadow: '0 2px 14px rgba(0,0,0,0.55)', letterSpacing: '-0.3px' }}>
+      {/* Content sits in the SKY area — top 42% — so village shops fully visible below */}
+      <div style={{
+        position: 'relative', zIndex: 10,
+        height: '42%', minHeight: 280,
+        display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center',
+        padding: '16px 16px 0',
+        textAlign: 'center',
+      }}>
+        {/* Logo + title */}
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ fontSize: 46, filter: 'drop-shadow(0 3px 8px rgba(0,0,0,0.3))' }}>🏘️</div>
+          <h1 style={{ fontSize: 28, fontWeight: 900, color: 'white', margin: '4px 0 2px',
+                       textShadow: '0 2px 12px rgba(0,0,0,0.5)' }}>
             VillageConnect
           </h1>
-          <p style={{ color: '#FFF8E1', fontSize: 14, fontWeight: 600,
-                      textShadow: '0 1px 8px rgba(0,0,0,0.5)' }}>
+          <p style={{ color: '#FFF8E1', fontSize: 13, fontWeight: 600,
+                      textShadow: '0 1px 6px rgba(0,0,0,0.45)', marginBottom: 0 }}>
             Your village. Your people. Your shops.
           </p>
         </div>
 
-        {/* Solid white card */}
-        <div style={{
-          background: 'white',
-          borderRadius: 24,
-          padding: '26px 22px',
-          maxWidth: 360,
-          width: '100%',
-          boxShadow: '0 16px 48px rgba(0,0,0,0.28)',
-        }}>
-          <p style={{ color: '#6B7280', fontSize: 13, marginBottom: 16 }}>
-            Know who's open right now, right in your village
-          </p>
-
-          <p style={{ color: '#111827', fontWeight: 700, fontSize: 15, marginBottom: 14 }}>I am a...</p>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
-            <button
-              onClick={() => navigate('/register?role=CUSTOMER')}
-              style={{
-                background: '#EFF6FF', color: '#1e3a5c',
-                border: '2px solid #BFDBFE', borderRadius: 16, padding: '16px 10px',
-                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
-                cursor: 'pointer', transition: 'all 0.15s', fontFamily: 'inherit'
-              }}
-              onMouseEnter={e => { e.currentTarget.style.background = '#DBEAFE'; e.currentTarget.style.borderColor = '#60A5FA'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = '#EFF6FF'; e.currentTarget.style.borderColor = '#BFDBFE'; }}
-            >
-              <span style={{ fontSize: 34 }}>👤</span>
-              <span style={{ fontWeight: 700, fontSize: 14 }}>Customer</span>
-              <span style={{ fontSize: 11, color: '#6B7280', textAlign: 'center' }}>Find shops & check what's open</span>
-            </button>
-            <button
-              onClick={() => navigate('/register?role=MERCHANT')}
-              style={{
-                background: '#F0FDF4', color: '#1e3a5c',
-                border: '2px solid #BBF7D0', borderRadius: 16, padding: '16px 10px',
-                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
-                cursor: 'pointer', transition: 'all 0.15s', fontFamily: 'inherit'
-              }}
-              onMouseEnter={e => { e.currentTarget.style.background = '#DCFCE7'; e.currentTarget.style.borderColor = '#4ADE80'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = '#F0FDF4'; e.currentTarget.style.borderColor = '#BBF7D0'; }}
-            >
-              <span style={{ fontSize: 34 }}>🏪</span>
-              <span style={{ fontWeight: 700, fontSize: 14 }}>Shop Owner</span>
-              <span style={{ fontSize: 11, color: '#6B7280', textAlign: 'center' }}>List your shop for FREE</span>
-            </button>
-          </div>
-
-          <p style={{ color: '#6B7280', fontSize: 13 }}>
-            Already have an account?{' '}
-            <button onClick={() => navigate('/login')}
-              style={{ color: '#1565C0', fontWeight: 700, textDecoration: 'underline',
-                       background: 'none', border: 'none', cursor: 'pointer',
-                       fontSize: 13, fontFamily: 'inherit' }}>
-              Login
-            </button>
-          </p>
+        {/* Compact pill buttons — no blocking card */}
+        <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
+          <button
+            onClick={() => navigate('/register?role=CUSTOMER')}
+            style={{
+              background: 'white', color: '#1e3a5c',
+              border: 'none', borderRadius: 50, padding: '10px 22px',
+              display: 'flex', alignItems: 'center', gap: 8,
+              cursor: 'pointer', fontFamily: 'inherit', fontWeight: 700, fontSize: 14,
+              boxShadow: '0 4px 16px rgba(0,0,0,0.22)', transition: 'transform 0.15s, box-shadow 0.15s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.28)'; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.22)'; }}
+          >
+            <span style={{ fontSize: 20 }}>👤</span> Customer
+          </button>
+          <button
+            onClick={() => navigate('/register?role=MERCHANT')}
+            style={{
+              background: 'white', color: '#1e3a5c',
+              border: 'none', borderRadius: 50, padding: '10px 22px',
+              display: 'flex', alignItems: 'center', gap: 8,
+              cursor: 'pointer', fontFamily: 'inherit', fontWeight: 700, fontSize: 14,
+              boxShadow: '0 4px 16px rgba(0,0,0,0.22)', transition: 'transform 0.15s, box-shadow 0.15s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.28)'; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.22)'; }}
+          >
+            <span style={{ fontSize: 20 }}>🏪</span> Shop Owner
+          </button>
         </div>
+
+        <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: 13,
+                    textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>
+          Already have an account?{' '}
+          <button onClick={() => navigate('/login')}
+            style={{ color: '#FFE082', fontWeight: 700, textDecoration: 'underline',
+                     background: 'none', border: 'none', cursor: 'pointer',
+                     fontSize: 13, fontFamily: 'inherit' }}>
+            Login
+          </button>
+        </p>
       </div>
 
-      {/* Bottom strip */}
-      <div className="relative z-10 py-5 px-4" style={{ background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(8px)' }}>
-        <div style={{ maxWidth: 420, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12, textAlign: 'center', color: 'white' }}>
+      {/* Village scene takes up the rest — fully visible */}
+      <div style={{ flex: 1 }} />
+
+      {/* Bottom feature strip */}
+      <div style={{
+        position: 'relative', zIndex: 10,
+        background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)',
+        padding: '12px 16px',
+      }}>
+        <div style={{ maxWidth: 420, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8, textAlign: 'center', color: 'white' }}>
           {[
-            { icon: '🟢', label: 'Live Open/Closed Status' },
+            { icon: '🟢', label: 'Live Open/Closed' },
             { icon: '📞', label: 'Call & WhatsApp' },
             { icon: '🗺️', label: 'Get Directions' },
           ].map(f => (
-            <div key={f.label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-              <span style={{ fontSize: 22 }}>{f.icon}</span>
-              <span style={{ fontSize: 11, color: '#ccc' }}>{f.label}</span>
+            <div key={f.label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+              <span style={{ fontSize: 18 }}>{f.icon}</span>
+              <span style={{ fontSize: 10, color: '#ccc' }}>{f.label}</span>
             </div>
           ))}
         </div>
