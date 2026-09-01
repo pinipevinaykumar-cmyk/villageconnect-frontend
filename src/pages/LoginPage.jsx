@@ -114,11 +114,11 @@ const LoginPage = () => {
             <div>
               <label style={{ display: 'block', fontSize: 13, fontWeight: 600,
                               color: '#374151', marginBottom: 6 }}>
-                Phone or Email
+                Username / Phone / Email
               </label>
               <input
                 type="text" name="emailOrPhone" value={form.emailOrPhone}
-                onChange={handleChange} placeholder="9999999999 or email" required
+                onChange={handleChange} placeholder="Username, phone or email" required
                 style={{
                   width: '100%', boxSizing: 'border-box',
                   border: '1.5px solid #E5E7EB', borderRadius: 12,

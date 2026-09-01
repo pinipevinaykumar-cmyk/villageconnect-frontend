@@ -8,7 +8,7 @@ const RegisterPage = () => {
   const [searchParams] = useSearchParams();
   const initialRole = searchParams.get('role') === 'MERCHANT' ? 'MERCHANT' : 'CUSTOMER';
   const [form, setForm] = useState({
-    name: '', email: '', phone: '', password: '', role: initialRole, village: 'Pandalapaka'
+    name: '', password: '', role: initialRole, village: 'Pandalapaka'
   });
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -58,11 +58,7 @@ const RegisterPage = () => {
               </div>
             </div>
             <input type="text" name="name" value={form.name} onChange={handleChange}
-                   required placeholder="Full Name" className={inputClass} />
-            <input type="tel" name="phone" value={form.phone} onChange={handleChange}
-                   required placeholder="Phone Number" className={inputClass} />
-            <input type="email" name="email" value={form.email} onChange={handleChange}
-                   required placeholder="Email" className={inputClass} />
+                   required placeholder="Username" className={inputClass} />
             <input type="password" name="password" value={form.password}
                    onChange={handleChange} required placeholder="Password (min 6 chars)"
                    className={inputClass} />
