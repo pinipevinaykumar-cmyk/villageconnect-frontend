@@ -353,68 +353,74 @@ const LandingPage = () => {
 
       {/* Main content */}
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-12 text-center">
-        <div style={{
-          background: 'rgba(0,0,0,0.60)',
-          backdropFilter: 'blur(14px)',
-          WebkitBackdropFilter: 'blur(14px)',
-          borderRadius: 28,
-          border: '1.5px solid rgba(255,255,255,0.18)',
-          padding: '36px 32px',
-          maxWidth: 390,
-          width: '100%',
-          color: 'white',
-          boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
-        }}>
-          <div style={{ fontSize: 56, marginBottom: 10 }}>🏘️</div>
-          <h1 style={{ fontSize: 30, fontWeight: 800, marginBottom: 6 }}>VillageConnect</h1>
-          <p style={{ color: '#FFE082', fontSize: 16, fontWeight: 600, marginBottom: 4 }}>
+
+        {/* Title floats above card over the sky */}
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ fontSize: 58, filter: 'drop-shadow(0 4px 10px rgba(0,0,0,0.35))' }}>🏘️</div>
+          <h1 style={{ fontSize: 32, fontWeight: 900, color: 'white', marginBottom: 4,
+                       textShadow: '0 2px 14px rgba(0,0,0,0.55)', letterSpacing: '-0.3px' }}>
+            VillageConnect
+          </h1>
+          <p style={{ color: '#FFF8E1', fontSize: 14, fontWeight: 600,
+                      textShadow: '0 1px 8px rgba(0,0,0,0.5)' }}>
             Your village. Your people. Your shops.
           </p>
-          <p style={{ color: '#ccc', fontSize: 13, marginBottom: 28 }}>
+        </div>
+
+        {/* Solid white card */}
+        <div style={{
+          background: 'white',
+          borderRadius: 24,
+          padding: '26px 22px',
+          maxWidth: 360,
+          width: '100%',
+          boxShadow: '0 16px 48px rgba(0,0,0,0.28)',
+        }}>
+          <p style={{ color: '#6B7280', fontSize: 13, marginBottom: 16 }}>
             Know who's open right now, right in your village
           </p>
 
-          <p style={{ color: '#FFE082', fontWeight: 700, fontSize: 17, marginBottom: 16 }}>I am a...</p>
+          <p style={{ color: '#111827', fontWeight: 700, fontSize: 15, marginBottom: 14 }}>I am a...</p>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 22 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
             <button
               onClick={() => navigate('/register?role=CUSTOMER')}
               style={{
-                background: 'rgba(255,255,255,0.95)', color: '#1a3a5c',
-                border: 'none', borderRadius: 18, padding: '20px 10px',
+                background: '#EFF6FF', color: '#1e3a5c',
+                border: '2px solid #BFDBFE', borderRadius: 16, padding: '16px 10px',
                 display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
-                cursor: 'pointer', boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
-                transition: 'transform 0.15s', fontFamily: 'inherit'
+                cursor: 'pointer', transition: 'all 0.15s', fontFamily: 'inherit'
               }}
-              onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.04)'}
-              onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+              onMouseEnter={e => { e.currentTarget.style.background = '#DBEAFE'; e.currentTarget.style.borderColor = '#60A5FA'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = '#EFF6FF'; e.currentTarget.style.borderColor = '#BFDBFE'; }}
             >
-              <span style={{ fontSize: 36 }}>👤</span>
-              <span style={{ fontWeight: 700, fontSize: 15 }}>Customer</span>
-              <span style={{ fontSize: 11, color: '#666', textAlign: 'center' }}>Find shops & check what's open</span>
+              <span style={{ fontSize: 34 }}>👤</span>
+              <span style={{ fontWeight: 700, fontSize: 14 }}>Customer</span>
+              <span style={{ fontSize: 11, color: '#6B7280', textAlign: 'center' }}>Find shops & check what's open</span>
             </button>
             <button
               onClick={() => navigate('/register?role=MERCHANT')}
               style={{
-                background: 'rgba(255,255,255,0.95)', color: '#1a3a5c',
-                border: 'none', borderRadius: 18, padding: '20px 10px',
+                background: '#F0FDF4', color: '#1e3a5c',
+                border: '2px solid #BBF7D0', borderRadius: 16, padding: '16px 10px',
                 display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
-                cursor: 'pointer', boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
-                transition: 'transform 0.15s', fontFamily: 'inherit'
+                cursor: 'pointer', transition: 'all 0.15s', fontFamily: 'inherit'
               }}
-              onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.04)'}
-              onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+              onMouseEnter={e => { e.currentTarget.style.background = '#DCFCE7'; e.currentTarget.style.borderColor = '#4ADE80'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = '#F0FDF4'; e.currentTarget.style.borderColor = '#BBF7D0'; }}
             >
-              <span style={{ fontSize: 36 }}>🏪</span>
-              <span style={{ fontWeight: 700, fontSize: 15 }}>Shop Owner</span>
-              <span style={{ fontSize: 11, color: '#666', textAlign: 'center' }}>List your shop for FREE</span>
+              <span style={{ fontSize: 34 }}>🏪</span>
+              <span style={{ fontWeight: 700, fontSize: 14 }}>Shop Owner</span>
+              <span style={{ fontSize: 11, color: '#6B7280', textAlign: 'center' }}>List your shop for FREE</span>
             </button>
           </div>
 
-          <p style={{ color: '#ccc', fontSize: 13 }}>
+          <p style={{ color: '#6B7280', fontSize: 13 }}>
             Already have an account?{' '}
             <button onClick={() => navigate('/login')}
-              style={{ color: '#FFE082', fontWeight: 700, textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, fontFamily: 'inherit' }}>
+              style={{ color: '#1565C0', fontWeight: 700, textDecoration: 'underline',
+                       background: 'none', border: 'none', cursor: 'pointer',
+                       fontSize: 13, fontFamily: 'inherit' }}>
               Login
             </button>
           </p>
