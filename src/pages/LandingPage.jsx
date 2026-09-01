@@ -405,16 +405,25 @@ const LandingPage = () => {
           </button>
         </div>
 
-        <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: 13,
-                    textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>
-          Already have an account?{' '}
+        <div style={{
+          background: 'rgba(0,0,0,0.45)',
+          borderRadius: 50,
+          padding: '8px 20px',
+          display: 'inline-flex', alignItems: 'center', gap: 6,
+        }}>
+          <span style={{ color: 'white', fontSize: 13, fontWeight: 500 }}>
+            Already have an account?
+          </span>
           <button onClick={() => navigate('/login')}
-            style={{ color: '#FFE082', fontWeight: 700, textDecoration: 'underline',
-                     background: 'none', border: 'none', cursor: 'pointer',
-                     fontSize: 13, fontFamily: 'inherit' }}>
-            Login
+            style={{
+              color: '#FFE082', fontWeight: 800, fontSize: 14,
+              background: 'none', border: 'none', cursor: 'pointer',
+              fontFamily: 'inherit', textDecoration: 'none',
+              letterSpacing: '0.2px',
+            }}>
+            Login →
           </button>
-        </p>
+        </div>
       </div>
 
       {/* Village scene takes up the rest — fully visible */}
