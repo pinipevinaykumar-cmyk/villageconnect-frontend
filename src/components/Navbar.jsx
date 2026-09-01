@@ -1,11 +1,13 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Store, LogOut, LayoutDashboard, Home, ShieldCheck } from 'lucide-react';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const isAuthPage = pathname === '/login' || pathname.startsWith('/register');
 
   const handleLogout = () => {
     logout();
@@ -53,7 +55,7 @@ const Navbar = () => {
                 <span className="hidden sm:inline">Logout</span>
               </button>
             </>
-          ) : (
+          ) : !isAuthPage && (
             <>
               <Link to="/login" className="text-sm hover:text-blue-200 px-2">
                 Login
