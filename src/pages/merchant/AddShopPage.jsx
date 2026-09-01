@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import API from '../../api/axios';
 
 const VILLAGES = ['Pandalapaka', 'Kadiyam', 'Rajanagaram', 'Kovvur', 'Nidadavolu'];
+
+const CLOUDINARY_CLOUD_NAME = process.env.REACT_APP_CLOUDINARY_CLOUD_NAME || 'villageconnect';
+const CLOUDINARY_UPLOAD_PRESET = process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET || 'villageconnect_shops';
 
 const AddShopPage = () => {
   const [categories, setCategories] = useState([]);
@@ -11,9 +14,13 @@ const AddShopPage = () => {
     name: '', ownerName: '', phone: '', whatsapp: '', description: '',
     address: '', village: 'Pandalapaka', district: 'East Godavari',
     state: 'Andhra Pradesh', categoryId: '', openTime: '08:00',
-    closeTime: '21:00', is24Hours: false, isDeliveryAvailable: false
+    closeTime: '21:00', is24Hours: false, isDeliveryAvailable: false,
+    imageUrl: ''
   });
+  const [imagePreview, setImagePreview] = useState(null);
+  const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false);
+  const fileInputRef = useRef();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -25,8 +32,52 @@ const AddShopPage = () => {
     setForm({ ...form, [name]: type === 'checkbox' ? checked : value });
   };
 
+  const handleImageSelect = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image must be under 5MB');
+      return;
+    }
+
+    // Show local preview immediately
+    setImagePreview(URL.createObjectURL(file));
+    setUploading(true);
+
+    try {
+      const data = new FormData();
+      data.append('file', file);
+      data.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+      data.append('folder', 'villageconnect/shops');
+
+      const res = await fetch(
+        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
+        { method: 'POST', body: data }
+      );
+
+      if (!res.ok) throw new Error('Upload failed');
+      const result = await res.json();
+      setForm(prev => ({ ...prev, imageUrl: result.secure_url }));
+      toast.success('Photo uploaded!');
+    } catch {
+      toast.error('Photo upload failed. Check Cloudinary setup.');
+      setImagePreview(null);
+      setForm(prev => ({ ...prev, imageUrl: '' }));
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImagePreview(null);
+    setForm(prev => ({ ...prev, imageUrl: '' }));
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (uploading) { toast.error('Please wait for photo to finish uploading'); return; }
     setLoading(true);
     try {
       await API.post('/merchant/shops', {
@@ -48,6 +99,61 @@ const AddShopPage = () => {
       <h1 className="text-xl font-bold text-gray-800 mb-6">Add Your Shop</h1>
       <form onSubmit={handleSubmit} className="space-y-5">
 
+        {/* ── SHOP PHOTO ── */}
+        <div className={sectionClass}>
+          <h2 className="font-semibold text-gray-700">Shop Photo</h2>
+          <p className="text-xs text-gray-400">Upload a photo of your shop — customers will see this</p>
+
+          {imagePreview ? (
+            <div className="relative">
+              <img
+                src={imagePreview}
+                alt="Shop preview"
+                className="w-full h-52 object-cover rounded-xl border border-gray-200"
+              />
+              {uploading && (
+                <div className="absolute inset-0 bg-white/70 rounded-xl flex items-center justify-center gap-2">
+                  <div className="w-5 h-5 border-2 border-blue-900 border-t-transparent rounded-full animate-spin" />
+                  <span className="text-sm font-medium text-blue-900">Uploading...</span>
+                </div>
+              )}
+              {!uploading && (
+                <button
+                  type="button"
+                  onClick={handleRemoveImage}
+                  className="absolute top-2 right-2 bg-red-500 text-white rounded-full
+                             w-7 h-7 flex items-center justify-center text-sm font-bold
+                             hover:bg-red-600 transition"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full h-40 border-2 border-dashed border-gray-300 rounded-xl
+                         flex flex-col items-center justify-center gap-2
+                         hover:border-blue-400 hover:bg-blue-50 transition cursor-pointer"
+            >
+              <span className="text-4xl">📷</span>
+              <span className="text-sm font-medium text-gray-600">Tap to upload shop photo</span>
+              <span className="text-xs text-gray-400">JPG, PNG up to 5MB</span>
+            </button>
+          )}
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onChange={handleImageSelect}
+            className="hidden"
+          />
+        </div>
+
+        {/* ── BASIC INFO ── */}
         <div className={sectionClass}>
           <h2 className="font-semibold text-gray-700">Basic Information</h2>
           <div>
@@ -79,6 +185,7 @@ const AddShopPage = () => {
           </div>
         </div>
 
+        {/* ── CONTACT ── */}
         <div className={sectionClass}>
           <h2 className="font-semibold text-gray-700">Contact Details</h2>
           <div>
@@ -94,6 +201,7 @@ const AddShopPage = () => {
           </div>
         </div>
 
+        {/* ── LOCATION ── */}
         <div className={sectionClass}>
           <h2 className="font-semibold text-gray-700">Location</h2>
           <div>
@@ -111,6 +219,7 @@ const AddShopPage = () => {
           </div>
         </div>
 
+        {/* ── TIMINGS ── */}
         <div className={sectionClass}>
           <h2 className="font-semibold text-gray-700">Shop Timings</h2>
           <label className="flex items-center gap-3 cursor-pointer">
@@ -140,7 +249,7 @@ const AddShopPage = () => {
           </label>
         </div>
 
-        <button type="submit" disabled={loading}
+        <button type="submit" disabled={loading || uploading}
           className="w-full bg-blue-900 text-white py-4 rounded-xl font-bold
                      text-base hover:bg-blue-950 transition disabled:opacity-50">
           {loading ? 'Adding shop...' : '🏪 Add Shop'}
