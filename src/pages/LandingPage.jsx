@@ -141,14 +141,15 @@ const LandingPage = () => {
         </div>
       </div>
 
-      {/* ── RIGHT: photo portion of the poster ── */}
-      <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
+      {/* ── RIGHT: crops to show only the photo portion (right half) ── */}
+      <div style={{ flex: 1, overflow: 'hidden' }}>
         <img
           src="/Designer.jpeg"
           alt="Local Connect village scene"
           style={{
-            position: 'absolute', top: 0, right: 0,
-            height: '100%', width: 'auto',
+            width: '100%', height: '100%',
+            objectFit: 'cover',
+            objectPosition: 'right center',
           }}
         />
       </div>
