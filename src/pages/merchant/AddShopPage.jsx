@@ -90,7 +90,7 @@ const AddShopPage = () => {
     } finally { setLoading(false); }
   };
 
-  const inputClass = "w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-800";
+  const inputClass = "w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-800";
   const labelClass = "block text-sm font-medium text-gray-700 mb-1";
   const sectionClass = "bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4";
 
@@ -114,7 +114,7 @@ const AddShopPage = () => {
               {uploading && (
                 <div className="absolute inset-0 bg-white/70 rounded-xl flex items-center justify-center gap-2">
                   <div className="w-5 h-5 border-2 border-blue-900 border-t-transparent rounded-full animate-spin" />
-                  <span className="text-sm font-medium text-blue-900">Uploading...</span>
+                  <span className="text-sm font-medium text-green-900">Uploading...</span>
                 </div>
               )}
               {!uploading && (
@@ -135,7 +135,7 @@ const AddShopPage = () => {
               onClick={() => fileInputRef.current?.click()}
               className="w-full h-40 border-2 border-dashed border-gray-300 rounded-xl
                          flex flex-col items-center justify-center gap-2
-                         hover:border-blue-400 hover:bg-blue-50 transition cursor-pointer"
+                         hover:border-blue-400 hover:bg-green-50 transition cursor-pointer"
             >
               <span className="text-4xl">📷</span>
               <span className="text-sm font-medium text-gray-600">Tap to upload shop photo</span>
@@ -250,8 +250,8 @@ const AddShopPage = () => {
         </div>
 
         <button type="submit" disabled={loading || uploading}
-          className="w-full bg-blue-900 text-white py-4 rounded-xl font-bold
-                     text-base hover:bg-blue-950 transition disabled:opacity-50">
+          className="w-full bg-green-900 text-white py-4 rounded-xl font-bold
+                     text-base hover:bg-green-950 transition disabled:opacity-50">
           {loading ? 'Adding shop...' : '🏪 Add Shop'}
         </button>
       </form>
