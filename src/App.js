@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
+import BottomNav from './components/BottomNav';
 import LandingPage from './pages/LandingPage';
 import HomePage from './pages/HomePage';
 import ShopListPage from './pages/ShopListPage';
@@ -17,10 +18,11 @@ import ProtectedRoute from './components/ProtectedRoute';
 
 const AppContent = () => {
   const location = useLocation();
-  const hideNavbar = location.pathname === '/';
+  const publicPaths = ['/', '/login', '/register'];
+  const isPublic = publicPaths.some(p => location.pathname === p || location.pathname.startsWith('/register'));
   return (
     <div className="min-h-screen bg-gray-50">
-      {!hideNavbar && <Navbar />}
+      <Navbar />
       <Toaster position="top-center" />
       <Routes>
         <Route path="/" element={<LandingPage />} />
@@ -34,6 +36,7 @@ const AppContent = () => {
         <Route path="/merchant/shops/:shopId/products" element={<ProtectedRoute requiredRole="MERCHANT"><ManageProductsPage /></ProtectedRoute>} />
         <Route path="/admin" element={<ProtectedRoute requiredRole="ADMIN"><AdminPage /></ProtectedRoute>} />
       </Routes>
+      {!isPublic && <BottomNav />}
     </div>
   );
 };

@@ -1,77 +1,199 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Store } from 'lucide-react';
+import { Search, MapPin, Crosshair, Phone, ChevronRight } from 'lucide-react';
+import API from '../api/axios';
+import { useAuth } from '../context/AuthContext';
 
-const VILLAGES = ['Pandalapaka', 'Kadiyam', 'Rajanagaram', 'Kovvur', 'Nidadavolu'];
+const DEFAULT_VILLAGE = 'Pandalapaka';
 
-const HomePage = () => {
-  const [selectedVillage, setSelectedVillage] = useState('');
+const CATEGORIES = [
+  { name: 'Grocery',    icon: '🧺' },
+  { name: 'Vegetables', icon: '🥦' },
+  { name: 'Dairy',      icon: '🥛' },
+  { name: 'Medicine',   icon: '💊' },
+  { name: 'More',       icon: '⋯'  },
+];
+
+const ShopRow = ({ shop }) => {
   const navigate = useNavigate();
+  const isOpen = shop.currentStatus === 'OPEN';
 
-  const handleSearch = () => {
-    if (!selectedVillage) return;
-    navigate(`/shops?village=${selectedVillage}`);
-  };
+  const handleCall = (e) => { e.stopPropagation(); if (shop.phone) window.open(`tel:${shop.phone}`); };
+  const handleWA   = (e) => { e.stopPropagation(); if (shop.phone) window.open(`https://wa.me/${shop.phone}`); };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-900 to-blue-950">
-      <div className="max-w-2xl mx-auto px-4 py-16 text-center text-white">
-        <div className="text-5xl mb-4">🏘️</div>
-        <h1 className="text-3xl font-bold mb-2">VillageConnect</h1>
-        <p className="text-blue-100 mb-8 text-lg">
-          Your village. Your people. Your shops.
-        </p>
-        <div className="bg-white rounded-2xl p-5 shadow-xl">
-          <p className="text-gray-600 text-sm mb-3 font-medium">Select your village</p>
-          <div className="flex flex-wrap gap-2 justify-center mb-4">
-            {VILLAGES.map((village) => (
-              <button key={village} onClick={() => setSelectedVillage(village)}
-                className={`px-4 py-2 rounded-full border-2 text-sm font-medium transition
-                  ${selectedVillage === village
-                    ? 'border-blue-800 bg-blue-800 text-white'
-                    : 'border-gray-200 text-gray-600 hover:border-blue-700'}`}>
-                {village}
-              </button>
-            ))}
+    <div onClick={() => navigate(`/shops/${shop.id}`)}
+      style={{
+        display: 'flex', alignItems: 'center', gap: 12,
+        padding: '12px 16px', background: 'white',
+        borderBottom: '1px solid #F3F4F6', cursor: 'pointer',
+      }}>
+
+      {/* Thumbnail */}
+      <div style={{
+        width: 62, height: 62, borderRadius: 10, overflow: 'hidden', flexShrink: 0,
+        background: '#E8F5E9', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontSize: 26,
+      }}>
+        {shop.imageUrl
+          ? <img src={shop.imageUrl} alt={shop.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          : <span>{shop.category?.icon || '🏪'}</span>
+        }
+      </div>
+
+      {/* Info */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: '#111827', marginBottom: 3 }}>
+          {shop.name}
+        </div>
+        <span style={{
+          fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 20,
+          background: isOpen ? '#E8F5E9' : '#FEE2E2',
+          color: isOpen ? '#15803D' : '#DC2626',
+          display: 'inline-block', marginBottom: 2,
+        }}>
+          {isOpen ? 'Open' : 'Closed'}
+        </span>
+        <div style={{ fontSize: 11, color: '#6B7280' }}>
+          {isOpen
+            ? shop.closeTime ? `Closes ${shop.closeTime}` : ''
+            : shop.openTime  ? `Opens ${shop.openTime}`  : ''}
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+        <button onClick={handleCall} style={{
+          background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: '#2E7D32',
+        }}>
+          <Phone size={18} />
+        </button>
+        {isOpen && (
+          <button onClick={handleWA} style={{
+            background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: '#25D366',
+          }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+            </svg>
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const HomePage = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [shops, setShops]           = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading]       = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [shopsRes, catsRes] = await Promise.all([
+          API.get('/public/shops', { params: { village: DEFAULT_VILLAGE } }),
+          API.get('/public/categories'),
+        ]);
+        setShops(shopsRes.data.data || []);
+        setCategories(catsRes.data.data || []);
+      } catch (err) { console.error(err); }
+      finally { setLoading(false); }
+    };
+    fetchData();
+  }, []);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    navigate(`/shops?village=${DEFAULT_VILLAGE}&q=${searchTerm}`);
+  };
+
+  const nearbyShops = shops.slice(0, 4);
+
+  return (
+    <div style={{ background: '#F9FAFB', minHeight: '100vh', paddingBottom: 72 }}>
+
+      {/* Search + Location bar */}
+      <div style={{ background: 'white', padding: '12px 16px 14px', borderBottom: '1px solid #F3F4F6' }}>
+        <form onSubmit={handleSearch}>
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 10,
+            background: '#F3F4F6', borderRadius: 12, padding: '10px 14px',
+          }}>
+            <Search size={16} color="#9CA3AF" />
+            <input
+              value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
+              placeholder="Search for shops, products..."
+              style={{
+                flex: 1, background: 'none', border: 'none', outline: 'none',
+                fontSize: 14, color: '#374151', fontFamily: 'inherit',
+              }}
+            />
           </div>
-          <button onClick={handleSearch} disabled={!selectedVillage}
-            className="w-full bg-blue-900 text-white py-3 rounded-xl font-semibold
-                       flex items-center justify-center gap-2 disabled:opacity-40
-                       hover:bg-blue-950 transition">
-            <Search size={18} />
-            Find Shops in {selectedVillage || 'your village'}
+        </form>
+
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <MapPin size={14} color="#2E7D32" />
+            <span style={{ fontSize: 13, color: '#374151', fontWeight: 500 }}>My Location</span>
+          </div>
+          <Crosshair size={18} color="#2E7D32" />
+        </div>
+      </div>
+
+      {/* Nearby Shops */}
+      <div style={{ marginTop: 12 }}>
+        <div style={{
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          padding: '0 16px 10px',
+        }}>
+          <span style={{ fontSize: 16, fontWeight: 800, color: '#111827' }}>Nearby Shops</span>
+          <button onClick={() => navigate(`/shops?village=${DEFAULT_VILLAGE}`)}
+            style={{
+              background: 'none', border: 'none', cursor: 'pointer', color: '#2E7D32',
+              fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 2,
+              fontFamily: 'inherit',
+            }}>
+            View All <ChevronRight size={14} />
           </button>
         </div>
-      </div>
 
-      <div className="bg-white py-12 px-4">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-center text-xl font-bold text-gray-800 mb-8">Why VillageConnect?</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              { icon: '🟢', title: 'Live Open/Closed Status', desc: 'See which shops are open right now before you go' },
-              { icon: '📞', title: 'Call & WhatsApp', desc: 'Contact shops directly with one tap' },
-              { icon: '🗺️', title: 'Get Directions', desc: 'Navigate to any shop easily' },
-            ].map((feature) => (
-              <div key={feature.title} className="text-center p-5 rounded-xl bg-blue-50">
-                <div className="text-3xl mb-3">{feature.icon}</div>
-                <h3 className="font-semibold text-gray-800 mb-1">{feature.title}</h3>
-                <p className="text-sm text-gray-600">{feature.desc}</p>
-              </div>
-            ))}
-          </div>
+        <div style={{ background: 'white', borderRadius: 16, margin: '0 12px', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+          {loading ? (
+            <div style={{ padding: 32, textAlign: 'center', color: '#9CA3AF' }}>Loading shops...</div>
+          ) : nearbyShops.length === 0 ? (
+            <div style={{ padding: 32, textAlign: 'center', color: '#9CA3AF' }}>No shops found</div>
+          ) : (
+            nearbyShops.map(shop => <ShopRow key={shop.id} shop={shop} />)
+          )}
         </div>
       </div>
 
-      <div className="bg-blue-950 py-10 px-4 text-center text-white">
-        <Store size={32} className="mx-auto mb-3 text-green-300" />
-        <h2 className="text-xl font-bold mb-2">Are you a shop owner?</h2>
-        <p className="text-blue-200 mb-5 text-sm">Register your shop for FREE!</p>
-        <a href="/register"
-           className="bg-white text-blue-950 px-6 py-3 rounded-xl font-semibold
-                      inline-block hover:bg-blue-50 transition">
-          Register Your Shop — Free
-        </a>
+      {/* Popular Categories */}
+      <div style={{ marginTop: 20, padding: '0 12px' }}>
+        <span style={{ fontSize: 16, fontWeight: 800, color: '#111827', display: 'block', marginBottom: 12 }}>
+          Popular Categories
+        </span>
+        <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
+          {(categories.length > 0
+            ? categories.map(c => ({ name: c.name, icon: c.icon || '🏪', id: c.id }))
+            : CATEGORIES
+          ).map((cat) => (
+            <button key={cat.name}
+              onClick={() => navigate(`/shops?village=${DEFAULT_VILLAGE}${cat.id ? `&categoryId=${cat.id}` : ''}`)}
+              style={{
+                flexShrink: 0, width: 72, background: 'white', borderRadius: 14,
+                border: 'none', padding: '12px 8px 10px', cursor: 'pointer',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+                boxShadow: '0 1px 4px rgba(0,0,0,0.06)', fontFamily: 'inherit',
+              }}>
+              <span style={{ fontSize: 24 }}>{cat.icon}</span>
+              <span style={{ fontSize: 10, fontWeight: 600, color: '#374151' }}>{cat.name}</span>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
