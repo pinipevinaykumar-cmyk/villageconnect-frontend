@@ -2,12 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, MapPin, Crosshair, Phone, ChevronRight } from 'lucide-react';
 import API from '../api/axios';
-import { useAuth } from '../context/AuthContext';
 
 const DEFAULT_VILLAGE = 'Pandalapaka';
 
 const CATEGORIES = [
-  { name: 'Grocery',    icon: '🧺' },
+  { name: 'Grocery',    icon: '🛒' },
   { name: 'Vegetables', icon: '🥦' },
   { name: 'Dairy',      icon: '🥛' },
   { name: 'Medicine',   icon: '💊' },
@@ -83,7 +82,6 @@ const ShopRow = ({ shop }) => {
 };
 
 const HomePage = () => {
-  const { user } = useAuth();
   const navigate = useNavigate();
   const [shops, setShops]           = useState([]);
   const [categories, setCategories] = useState([]);
@@ -113,14 +111,14 @@ const HomePage = () => {
   const nearbyShops = shops.slice(0, 4);
 
   return (
-    <div style={{ background: '#F9FAFB', minHeight: '100vh', paddingBottom: 72 }}>
+    <div style={{ background: '#F3F4F6', minHeight: '100vh', paddingBottom: 80 }}>
 
       {/* Search + Location bar */}
-      <div style={{ background: 'white', padding: '12px 16px 14px', borderBottom: '1px solid #F3F4F6' }}>
+      <div style={{ background: 'white', padding: '14px 16px 12px', boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
         <form onSubmit={handleSearch}>
           <div style={{
             display: 'flex', alignItems: 'center', gap: 10,
-            background: '#F3F4F6', borderRadius: 12, padding: '10px 14px',
+            background: '#F3F4F6', borderRadius: 50, padding: '11px 16px',
           }}>
             <Search size={16} color="#9CA3AF" />
             <input
@@ -134,37 +132,37 @@ const HomePage = () => {
           </div>
         </form>
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <MapPin size={14} color="#2E7D32" />
-            <span style={{ fontSize: 13, color: '#374151', fontWeight: 500 }}>My Location</span>
+            <MapPin size={15} color="#2E7D32" fill="#E8F5E9" />
+            <span style={{ fontSize: 14, color: '#374151', fontWeight: 600 }}>My Location</span>
           </div>
           <Crosshair size={18} color="#2E7D32" />
         </div>
       </div>
 
       {/* Nearby Shops */}
-      <div style={{ marginTop: 12 }}>
+      <div style={{ marginTop: 14, padding: '0 12px' }}>
         <div style={{
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          padding: '0 16px 10px',
+          marginBottom: 10,
         }}>
-          <span style={{ fontSize: 16, fontWeight: 800, color: '#111827' }}>Nearby Shops</span>
+          <span style={{ fontSize: 17, fontWeight: 800, color: '#111827' }}>Nearby Shops</span>
           <button onClick={() => navigate(`/shops?village=${DEFAULT_VILLAGE}`)}
             style={{
               background: 'none', border: 'none', cursor: 'pointer', color: '#2E7D32',
-              fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 2,
+              fontSize: 13, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 2,
               fontFamily: 'inherit',
             }}>
             View All <ChevronRight size={14} />
           </button>
         </div>
 
-        <div style={{ background: 'white', borderRadius: 16, margin: '0 12px', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+        <div style={{ background: 'white', borderRadius: 18, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.07)' }}>
           {loading ? (
-            <div style={{ padding: 32, textAlign: 'center', color: '#9CA3AF' }}>Loading shops...</div>
+            <div style={{ padding: 36, textAlign: 'center', color: '#9CA3AF', fontSize: 14 }}>Loading shops...</div>
           ) : nearbyShops.length === 0 ? (
-            <div style={{ padding: 32, textAlign: 'center', color: '#9CA3AF' }}>No shops found</div>
+            <div style={{ padding: 36, textAlign: 'center', color: '#9CA3AF', fontSize: 14 }}>No shops found nearby</div>
           ) : (
             nearbyShops.map(shop => <ShopRow key={shop.id} shop={shop} />)
           )}
@@ -173,10 +171,11 @@ const HomePage = () => {
 
       {/* Popular Categories */}
       <div style={{ marginTop: 20, padding: '0 12px' }}>
-        <span style={{ fontSize: 16, fontWeight: 800, color: '#111827', display: 'block', marginBottom: 12 }}>
+        <span style={{ fontSize: 17, fontWeight: 800, color: '#111827', display: 'block', marginBottom: 12 }}>
           Popular Categories
         </span>
-        <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
+        <div style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 6,
+          scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {(categories.length > 0
             ? categories.map(c => ({ name: c.name, icon: c.icon || '🏪', id: c.id }))
             : CATEGORIES
@@ -184,13 +183,13 @@ const HomePage = () => {
             <button key={cat.name}
               onClick={() => navigate(`/shops?village=${DEFAULT_VILLAGE}${cat.id ? `&categoryId=${cat.id}` : ''}`)}
               style={{
-                flexShrink: 0, width: 72, background: 'white', borderRadius: 14,
-                border: 'none', padding: '12px 8px 10px', cursor: 'pointer',
-                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
-                boxShadow: '0 1px 4px rgba(0,0,0,0.06)', fontFamily: 'inherit',
+                flexShrink: 0, width: 76, background: 'white', borderRadius: 16,
+                border: 'none', padding: '14px 8px 12px', cursor: 'pointer',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
+                boxShadow: '0 2px 8px rgba(0,0,0,0.07)', fontFamily: 'inherit',
               }}>
-              <span style={{ fontSize: 24 }}>{cat.icon}</span>
-              <span style={{ fontSize: 10, fontWeight: 600, color: '#374151' }}>{cat.name}</span>
+              <span style={{ fontSize: 26 }}>{cat.icon}</span>
+              <span style={{ fontSize: 11, fontWeight: 600, color: '#374151', textAlign: 'center' }}>{cat.name}</span>
             </button>
           ))}
         </div>
