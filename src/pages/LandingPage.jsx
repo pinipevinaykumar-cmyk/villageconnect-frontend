@@ -15,22 +15,22 @@ const LandingPage = () => {
   return (
     <div style={{ minHeight: '100vh', position: 'relative', overflow: 'hidden' }}>
 
-      {/* Poster — full image, no cropping */}
+      {/* Poster — fixed to viewport so full image always visible */}
       <img
         src="/Designer.jpeg"
         alt=""
         style={{
-          position: 'absolute', inset: 0, zIndex: 0,
-          width: '100%', height: '100%',
+          position: 'fixed', top: 0, left: 0, zIndex: 0,
+          width: '100vw', height: '100vh',
           objectFit: 'contain',
           objectPosition: 'center',
           backgroundColor: '#f5f0e8',
         }}
       />
 
-      {/* Light bottom gradient so buttons stay readable */}
+      {/* Bottom gradient so buttons are readable */}
       <div style={{
-        position: 'absolute', bottom: 0, left: 0, right: 0,
+        position: 'fixed', bottom: 0, left: 0, right: 0,
         height: 160, zIndex: 1, pointerEvents: 'none',
         background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 100%)',
       }} />
