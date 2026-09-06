@@ -25,7 +25,7 @@ const LandingPage = () => {
 
       {/* ── LEFT: content panel ── */}
       <div style={{
-        width: '45%', minWidth: 300, maxWidth: 520,
+        width: '60%', minWidth: 340, maxWidth: 620,
         background: '#FAFAF5',
         padding: '32px 28px',
         overflowY: 'auto',
@@ -141,17 +141,20 @@ const LandingPage = () => {
         </div>
       </div>
 
-      {/* ── RIGHT: crops to show only the photo portion (right half) ── */}
-      <div style={{ flex: 1, overflow: 'hidden' }}>
-        <img
-          src="/Designer.jpeg"
-          alt="Local Connect village scene"
-          style={{
-            width: '100%', height: '100%',
-            objectFit: 'cover',
-            objectPosition: 'right center',
-          }}
-        />
+      {/* ── RIGHT: shows only the photo half of the poster ── */}
+      <div style={{
+        flex: 1, position: 'relative', overflow: 'hidden',
+        backgroundImage: 'url(/Designer.jpeg)',
+        backgroundSize: 'auto 100%',
+        backgroundPosition: 'right center',
+        backgroundRepeat: 'no-repeat',
+      }}>
+        {/* Smooth left-edge fade to match left panel */}
+        <div style={{
+          position: 'absolute', top: 0, left: 0, bottom: 0, width: 60,
+          background: 'linear-gradient(to right, #FAFAF5, transparent)',
+          pointerEvents: 'none',
+        }} />
       </div>
     </div>
   );
