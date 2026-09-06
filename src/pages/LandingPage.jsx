@@ -141,7 +141,7 @@ const LandingPage = () => {
         </div>
       </div>
 
-      {/* ── RIGHT: shows only the photo half of the poster ── */}
+      {/* ── RIGHT: photo panel — poster anchored to right edge ── */}
       <div style={{
         flex: 1, position: 'relative', overflow: 'hidden',
         backgroundImage: 'url(/Designer.jpeg)',
@@ -149,10 +149,10 @@ const LandingPage = () => {
         backgroundPosition: 'right center',
         backgroundRepeat: 'no-repeat',
       }}>
-        {/* Smooth left-edge fade to match left panel */}
+        {/* Wide solid+fade mask — hides all poster text that bleeds in */}
         <div style={{
-          position: 'absolute', top: 0, left: 0, bottom: 0, width: 60,
-          background: 'linear-gradient(to right, #FAFAF5, transparent)',
+          position: 'absolute', top: 0, left: 0, bottom: 0, width: '55%',
+          background: 'linear-gradient(to right, #FAFAF5 0%, #FAFAF5 35%, transparent 100%)',
           pointerEvents: 'none',
         }} />
       </div>
