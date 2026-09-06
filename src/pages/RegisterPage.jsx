@@ -5,6 +5,22 @@ import { useAuth } from '../context/AuthContext';
 import API from '../api/axios';
 import VillageBg from '../components/VillageBg';
 
+const LocalConnectLogo = () => (
+  <svg width="48" height="58" viewBox="0 0 62 74" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M31 2C16.6 2 5 13.6 5 28C5 46.5 31 72 31 72C31 72 57 46.5 57 28C57 13.6 45.4 2 31 2Z" fill="#1B5E20"/>
+    <circle cx="31" cy="28" r="21" fill="#2E7D32"/>
+    <polygon points="31,14 18,23 44,23" fill="white"/>
+    <rect x="18" y="23" width="26" height="20" rx="1" fill="white"/>
+    <rect x="26" y="31" width="10" height="12" rx="1" fill="#2E7D32"/>
+    <rect x="19" y="25" width="7" height="6" rx="1" fill="#A5D6A7"/>
+    <rect x="36" y="25" width="7" height="6" rx="1" fill="#A5D6A7"/>
+    <ellipse cx="6" cy="27" rx="5" ry="9" fill="#4CAF50" transform="rotate(-28 6 27)"/>
+    <ellipse cx="7" cy="19" rx="3.5" ry="7" fill="#66BB6A" transform="rotate(-45 7 19)"/>
+    <ellipse cx="56" cy="27" rx="5" ry="9" fill="#4CAF50" transform="rotate(28 56 27)"/>
+    <ellipse cx="55" cy="19" rx="3.5" ry="7" fill="#66BB6A" transform="rotate(45 55 19)"/>
+  </svg>
+);
+
 const RegisterPage = () => {
   const [searchParams] = useSearchParams();
   const initialRole = searchParams.get('role') === 'MERCHANT' ? 'MERCHANT' : 'CUSTOMER';
@@ -38,7 +54,6 @@ const RegisterPage = () => {
     <div style={{ minHeight: '100vh', position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
       <VillageBg />
 
-      {/* Form sits in the sky area — shops visible below */}
       <div style={{
         position: 'relative', zIndex: 10,
         flex: 1,
@@ -49,14 +64,17 @@ const RegisterPage = () => {
       }}>
         {/* Logo + heading */}
         <div style={{ textAlign: 'center', marginBottom: 14 }}>
-          <div style={{ fontSize: 44, filter: 'drop-shadow(0 3px 8px rgba(0,0,0,0.3))' }}>🏘️</div>
-          <h1 style={{ fontSize: 24, fontWeight: 900, color: 'white', margin: '4px 0 2px',
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 6,
+                        filter: 'drop-shadow(0 3px 10px rgba(0,0,0,0.35))' }}>
+            <LocalConnectLogo />
+          </div>
+          <h1 style={{ fontSize: 24, fontWeight: 900, color: 'white', margin: '2px 0 2px',
                        textShadow: '0 2px 12px rgba(0,0,0,0.55)' }}>
-            Join VillageConnect
+            Local Connect
           </h1>
-          <p style={{ color: '#FFF8E1', fontSize: 13, fontWeight: 600,
+          <p style={{ color: '#F1F8E9', fontSize: 13, fontWeight: 600,
                       textShadow: '0 1px 6px rgba(0,0,0,0.45)', margin: 0 }}>
-            Your village. Your people. Your shops.
+            Bringing local businesses closer to you
           </p>
         </div>
 
@@ -68,6 +86,11 @@ const RegisterPage = () => {
           padding: '28px 24px',
           boxShadow: '0 20px 60px rgba(0,0,0,0.35)',
         }}>
+          <h2 style={{ fontSize: 16, fontWeight: 700, color: '#1B5E20',
+                       marginBottom: 16, textAlign: 'center' }}>
+            Create your account
+          </h2>
+
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {/* Role toggle */}
             <div>
@@ -81,9 +104,9 @@ const RegisterPage = () => {
                     style={{
                       padding: '10px 0', borderRadius: 12, fontFamily: 'inherit',
                       fontSize: 14, fontWeight: 600, cursor: 'pointer',
-                      border: form.role === r ? '2px solid #1565C0' : '2px solid #E5E7EB',
-                      background: form.role === r ? '#EFF6FF' : 'white',
-                      color: form.role === r ? '#1e3a8a' : '#6B7280',
+                      border: form.role === r ? '2px solid #2E7D32' : '2px solid #E5E7EB',
+                      background: form.role === r ? '#F1F8E9' : 'white',
+                      color: form.role === r ? '#1B5E20' : '#6B7280',
                       transition: 'all 0.15s',
                     }}>
                     {r === 'CUSTOMER' ? '👤 Customer' : '🏪 Shop Owner'}
@@ -108,7 +131,7 @@ const RegisterPage = () => {
                   outline: 'none', fontFamily: 'inherit', background: '#F9FAFB',
                   transition: 'border-color 0.2s',
                 }}
-                onFocus={e => { e.target.style.borderColor = '#1565C0'; e.target.style.background = 'white'; }}
+                onFocus={e => { e.target.style.borderColor = '#2E7D32'; e.target.style.background = 'white'; }}
                 onBlur={e => { e.target.style.borderColor = '#E5E7EB'; e.target.style.background = '#F9FAFB'; }}
               />
             </div>
@@ -129,7 +152,7 @@ const RegisterPage = () => {
                   outline: 'none', fontFamily: 'inherit', background: '#F9FAFB',
                   transition: 'border-color 0.2s',
                 }}
-                onFocus={e => { e.target.style.borderColor = '#1565C0'; e.target.style.background = 'white'; }}
+                onFocus={e => { e.target.style.borderColor = '#2E7D32'; e.target.style.background = 'white'; }}
                 onBlur={e => { e.target.style.borderColor = '#E5E7EB'; e.target.style.background = '#F9FAFB'; }}
               />
             </div>
@@ -139,10 +162,10 @@ const RegisterPage = () => {
               style={{
                 width: '100%', padding: '13px', borderRadius: 14, border: 'none',
                 background: loading ? '#9CA3AF'
-                  : 'linear-gradient(135deg, #1565C0 0%, #0D47A1 100%)',
+                  : 'linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%)',
                 color: 'white', fontWeight: 700, fontSize: 15,
                 cursor: loading ? 'not-allowed' : 'pointer',
-                boxShadow: loading ? 'none' : '0 4px 14px rgba(21,101,192,0.4)',
+                boxShadow: loading ? 'none' : '0 4px 14px rgba(46,125,50,0.45)',
                 fontFamily: 'inherit', transition: 'opacity 0.2s',
                 marginTop: 4,
               }}
@@ -153,14 +176,13 @@ const RegisterPage = () => {
 
           <p style={{ textAlign: 'center', fontSize: 13, color: '#6B7280', marginTop: 18 }}>
             Already have an account?{' '}
-            <Link to="/login" style={{ color: '#1565C0', fontWeight: 700, textDecoration: 'none' }}>
+            <Link to="/login" style={{ color: '#2E7D32', fontWeight: 700, textDecoration: 'none' }}>
               Login
             </Link>
           </p>
         </div>
       </div>
 
-      {/* Village shops visible below — spacer */}
       <div style={{ height: 220 }} />
     </div>
   );
