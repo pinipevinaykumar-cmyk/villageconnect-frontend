@@ -1,7 +1,6 @@
 import React from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import VillageBg from '../components/VillageBg';
 
 const LocalConnectLogo = () => (
   <svg width="48" height="58" viewBox="0 0 62 74" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -87,13 +86,19 @@ const LandingPage = () => {
   return (
     <div style={{ minHeight: '100vh', position: 'relative', overflow: 'hidden' }}>
 
-      {/* Village scene background */}
-      <VillageBg />
+      {/* Real photo background */}
+      <div style={{
+        position: 'absolute', inset: 0, zIndex: 0,
+        backgroundImage: 'url(/Designer.jpeg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      }} />
 
-      {/* Warm golden overlay to match the photo's sunset tones */}
+      {/* Subtle dark overlay so content card pops */}
       <div style={{
         position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 1,
-        background: 'linear-gradient(160deg, rgba(255,210,80,0.28) 0%, rgba(255,180,40,0.18) 40%, rgba(80,120,30,0.12) 100%)',
+        background: 'rgba(0,0,0,0.18)',
       }} />
 
       {/* Scrollable content over the village */}
