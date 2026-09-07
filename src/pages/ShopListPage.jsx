@@ -9,7 +9,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 const ShopListPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const village = searchParams.get('village') || 'Pandalapaka';
+  const village = searchParams.get('village') || '';
   const [shops, setShops] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -26,7 +26,8 @@ const ShopListPage = () => {
   const fetchShops = useCallback(async () => {
     setLoading(true);
     try {
-      const params = { village };
+      const params = {};
+      if (village) params.village = village;
       if (selectedCategory) params.categoryId = selectedCategory;
       const res = await API.get('/public/shops', { params });
       setShops(res.data.data);
@@ -42,7 +43,9 @@ const ShopListPage = () => {
     if (!searchTerm.trim()) { fetchShops(); return; }
     setLoading(true);
     try {
-      const res = await API.get('/public/shops/search', { params: { village, keyword: searchTerm } });
+      const params = { keyword: searchTerm };
+      if (village) params.village = village;
+      const res = await API.get('/public/shops/search', { params });
       setShops(res.data.data);
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
@@ -56,7 +59,7 @@ const ShopListPage = () => {
                      mb-3 text-sm font-medium transition">
           <ArrowLeft size={18} /> Back
         </button>
-        <h1 className="text-xl font-bold text-gray-800">📍 {village}</h1>
+        <h1 className="text-xl font-bold text-gray-800">📍 {village || 'All India'}</h1>
         <p className="text-sm text-gray-500">{shops.length} shops found</p>
       </div>
 

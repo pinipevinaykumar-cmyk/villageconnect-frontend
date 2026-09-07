@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, MapPin, Crosshair, Phone, ChevronRight } from 'lucide-react';
+import { Search, MapPin, Phone, ChevronRight } from 'lucide-react';
 import API from '../api/axios';
 
-const DEFAULT_VILLAGE = 'Pandalapaka';
 
 const CATEGORIES = [
   { name: 'Grocery',    icon: '🛒' },
@@ -92,7 +91,7 @@ const HomePage = () => {
     const fetchData = async () => {
       try {
         const [shopsRes, catsRes] = await Promise.all([
-          API.get('/public/shops', { params: { village: DEFAULT_VILLAGE } }),
+          API.get('/public/shops'),
           API.get('/public/categories'),
         ]);
         setShops(shopsRes.data.data || []);
@@ -105,7 +104,7 @@ const HomePage = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    navigate(`/shops?village=${DEFAULT_VILLAGE}&q=${searchTerm}`);
+    navigate(`/shops?q=${searchTerm}`);
   };
 
   const nearbyShops = shops.slice(0, 4);
@@ -135,9 +134,8 @@ const HomePage = () => {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <MapPin size={15} color="#2E7D32" fill="#E8F5E9" />
-            <span style={{ fontSize: 14, color: '#374151', fontWeight: 600 }}>My Location</span>
+            <span style={{ fontSize: 14, color: '#374151', fontWeight: 600 }}>All India</span>
           </div>
-          <Crosshair size={18} color="#2E7D32" />
         </div>
       </div>
 
@@ -147,8 +145,8 @@ const HomePage = () => {
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           marginBottom: 10,
         }}>
-          <span style={{ fontSize: 17, fontWeight: 800, color: '#111827' }}>Nearby Shops</span>
-          <button onClick={() => navigate(`/shops?village=${DEFAULT_VILLAGE}`)}
+          <span style={{ fontSize: 17, fontWeight: 800, color: '#111827' }}>Shops in India</span>
+          <button onClick={() => navigate('/shops')}
             style={{
               background: 'none', border: 'none', cursor: 'pointer', color: '#2E7D32',
               fontSize: 13, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 2,
@@ -181,7 +179,7 @@ const HomePage = () => {
             : CATEGORIES
           ).map((cat) => (
             <button key={cat.name}
-              onClick={() => navigate(`/shops?village=${DEFAULT_VILLAGE}${cat.id ? `&categoryId=${cat.id}` : ''}`)}
+              onClick={() => navigate(`/shops${cat.id ? `?categoryId=${cat.id}` : ''}`)}
               style={{
                 flexShrink: 0, width: 76, background: 'white', borderRadius: 16,
                 border: 'none', padding: '14px 8px 12px', cursor: 'pointer',
