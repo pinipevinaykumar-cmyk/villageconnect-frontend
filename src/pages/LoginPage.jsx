@@ -16,13 +16,15 @@ const Logo = () => (
   </svg>
 );
 
-const inputStyle = {
+const inp = {
   width: '100%', boxSizing: 'border-box',
   border: '1.5px solid #E2E8F0', borderRadius: 12,
   padding: '13px 14px', fontSize: 14, color: '#0F172A',
   outline: 'none', fontFamily: 'inherit', background: '#F8FAFC',
   transition: 'all .15s',
 };
+const focus = e => { e.target.style.borderColor = '#1E7B3B'; e.target.style.background = 'white'; e.target.style.boxShadow = '0 0 0 3px rgba(30,123,59,.12)'; };
+const blur  = e => { e.target.style.borderColor = '#E2E8F0'; e.target.style.background = '#F8FAFC'; e.target.style.boxShadow = 'none'; };
 
 const LoginPage = () => {
   const [form, setForm] = useState({ emailOrPhone: '', password: '' });
@@ -31,7 +33,7 @@ const LoginPage = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -51,7 +53,7 @@ const LoginPage = () => {
       if (err.code === 'ECONNABORTED' || !err.response) {
         toast.error('Server is waking up — please wait 30 seconds and try again.');
       } else {
-        toast.error(err.response?.data?.message || 'Login failed. Please try again.');
+        toast.error(err.response?.data?.message || 'Login failed. Check your username and password.');
       }
     } finally {
       setLoading(false);
@@ -68,31 +70,22 @@ const LoginPage = () => {
       position: 'relative', overflow: 'hidden',
     }}>
 
-      {/* Background glows */}
       <div style={{ position: 'absolute', top: -80, right: -80, width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(30,123,59,.3) 0%, transparent 70%)', pointerEvents: 'none' }} />
       <div style={{ position: 'absolute', bottom: -80, left: -80, width: 280, height: 280, borderRadius: '50%', background: 'radial-gradient(circle, rgba(245,158,11,.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
-      {/* Back to landing */}
       <button onClick={() => navigate('/')}
-        style={{ position: 'absolute', top: 20, left: 20, background: 'rgba(255,255,255,.08)', border: '1px solid rgba(255,255,255,.15)', borderRadius: 10, padding: '8px 14px', color: 'rgba(255,255,255,.7)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', backdropFilter: 'blur(8px)' }}>
+        style={{ position: 'absolute', top: 20, left: 20, background: 'rgba(255,255,255,.08)', border: '1px solid rgba(255,255,255,.15)', borderRadius: 10, padding: '8px 14px', color: 'rgba(255,255,255,.7)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
         ← Back
       </button>
 
-      {/* Logo + brand */}
       <div style={{ textAlign: 'center', marginBottom: 28, position: 'relative', zIndex: 10 }}>
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12, filter: 'drop-shadow(0 4px 16px rgba(0,0,0,.4))' }}>
-          <Logo />
-        </div>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12, filter: 'drop-shadow(0 4px 16px rgba(0,0,0,.4))' }}><Logo /></div>
         <div style={{ fontSize: 24, fontWeight: 900, color: 'white', letterSpacing: '-0.5px', marginBottom: 4 }}>Local Connect</div>
         <div style={{ fontSize: 13, color: 'rgba(255,255,255,.5)', fontWeight: 500 }}>One Place for Everything</div>
       </div>
 
-      {/* Card */}
-      <div style={{
-        width: '100%', maxWidth: 400, position: 'relative', zIndex: 10,
-        background: 'white', borderRadius: 24, padding: '32px 28px',
-        boxShadow: '0 24px 80px rgba(0,0,0,.4)',
-      }}>
+      <div style={{ width: '100%', maxWidth: 400, position: 'relative', zIndex: 10, background: 'white', borderRadius: 24, padding: '32px 28px', boxShadow: '0 24px 80px rgba(0,0,0,.4)' }}>
+
         <div style={{ marginBottom: 24 }}>
           <div style={{ fontSize: 20, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.3px', marginBottom: 4 }}>Welcome back 👋</div>
           <div style={{ fontSize: 13, color: '#94A3B8' }}>Login to your Local Connect account</div>
@@ -100,19 +93,20 @@ const LoginPage = () => {
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
+          {/* Username */}
           <div>
             <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#475569', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.04em' }}>
-              Username / Phone / Email
+              Username
             </label>
             <input
               type="text" name="emailOrPhone" value={form.emailOrPhone}
-              onChange={handleChange} placeholder="Enter your username or email" required
-              style={inputStyle}
-              onFocus={e => { e.target.style.borderColor = '#1E7B3B'; e.target.style.background = 'white'; e.target.style.boxShadow = '0 0 0 3px rgba(30,123,59,.12)'; }}
-              onBlur={e => { e.target.style.borderColor = '#E2E8F0'; e.target.style.background = '#F8FAFC'; e.target.style.boxShadow = 'none'; }}
+              onChange={handleChange} placeholder="Enter your username" required
+              style={inp} onFocus={focus} onBlur={blur}
+              autoCapitalize="none" autoCorrect="off"
             />
           </div>
 
+          {/* Password */}
           <div>
             <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#475569', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.04em' }}>
               Password
@@ -121,9 +115,8 @@ const LoginPage = () => {
               <input
                 type={show ? 'text' : 'password'} name="password" value={form.password}
                 onChange={handleChange} placeholder="Enter your password" required
-                style={{ ...inputStyle, paddingRight: 46 }}
-                onFocus={e => { e.target.style.borderColor = '#1E7B3B'; e.target.style.background = 'white'; e.target.style.boxShadow = '0 0 0 3px rgba(30,123,59,.12)'; }}
-                onBlur={e => { e.target.style.borderColor = '#E2E8F0'; e.target.style.background = '#F8FAFC'; e.target.style.boxShadow = 'none'; }}
+                style={{ ...inp, paddingRight: 46 }}
+                onFocus={focus} onBlur={blur}
               />
               <button type="button" onClick={() => setShow(!show)}
                 style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: '#94A3B8' }}>
@@ -139,7 +132,7 @@ const LoginPage = () => {
               color: 'white', fontWeight: 800, fontSize: 15,
               cursor: loading ? 'not-allowed' : 'pointer',
               boxShadow: loading ? 'none' : '0 6px 20px rgba(30,123,59,.4)',
-              fontFamily: 'inherit', letterSpacing: '-0.2px', marginTop: 4,
+              fontFamily: 'inherit', marginTop: 4,
             }}>
             {loading ? 'Logging in...' : 'Login →'}
           </button>
@@ -147,9 +140,7 @@ const LoginPage = () => {
 
         <div style={{ marginTop: 22, paddingTop: 20, borderTop: '1px solid #F1F5F9', textAlign: 'center' }}>
           <span style={{ fontSize: 14, color: '#94A3B8' }}>Don't have an account? </span>
-          <Link to="/register" style={{ fontSize: 14, fontWeight: 700, color: '#1E7B3B', textDecoration: 'none' }}>
-            Sign up free →
-          </Link>
+          <Link to="/register" style={{ fontSize: 14, fontWeight: 700, color: '#1E7B3B', textDecoration: 'none' }}>Sign up free →</Link>
         </div>
       </div>
 

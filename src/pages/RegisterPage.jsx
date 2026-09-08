@@ -17,32 +17,46 @@ const Logo = () => (
 );
 
 const roles = [
-  { id: 'CUSTOMER',  icon: '👤', label: 'Customer',    desc: 'Find shops & services' },
-  { id: 'MERCHANT',  icon: '🏪', label: 'Shop Owner',  desc: 'List your business' },
+  { id: 'CUSTOMER', icon: '👤', label: 'Customer',   desc: 'Find shops & services' },
+  { id: 'MERCHANT', icon: '🏪', label: 'Shop Owner', desc: 'List your business' },
 ];
 
-const inputStyle = {
+const inp = {
   width: '100%', boxSizing: 'border-box',
   border: '1.5px solid #E2E8F0', borderRadius: 12,
   padding: '13px 14px', fontSize: 14, color: '#0F172A',
   outline: 'none', fontFamily: 'inherit', background: '#F8FAFC',
   transition: 'all .15s',
 };
+const lbl = { display: 'block', fontSize: 12, fontWeight: 700, color: '#475569', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.04em' };
+
+const focus = e => { e.target.style.borderColor = '#1E7B3B'; e.target.style.background = 'white'; e.target.style.boxShadow = '0 0 0 3px rgba(30,123,59,.12)'; };
+const blur  = e => { e.target.style.borderColor = '#E2E8F0'; e.target.style.background = '#F8FAFC'; e.target.style.boxShadow = 'none'; };
 
 const RegisterPage = () => {
   const [searchParams] = useSearchParams();
   const initialRole = searchParams.get('role') === 'MERCHANT' ? 'MERCHANT' : 'CUSTOMER';
 
-  const [form, setForm] = useState({ name: '', password: '', role: initialRole, village: '' });
+  const [form, setForm] = useState({ phone: '', name: '', password: '', role: initialRole });
   const [loading, setLoading] = useState(false);
   const [show, setShow] = useState(false);
+  const [phoneError, setPhoneError] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm(f => ({ ...f, [name]: value }));
+    if (name === 'phone') {
+      if (value && !/^\d*$/.test(value)) { setPhoneError('Only numbers allowed'); return; }
+      setPhoneError('');
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!form.phone.trim() || !/^\d+$/.test(form.phone)) { toast.error('Enter a valid phone number (digits only)'); return; }
+    if (form.name.trim().length < 3) { toast.error('Username must be at least 3 characters'); return; }
     if (form.password.length < 6) { toast.error('Password must be at least 6 characters'); return; }
     setLoading(true);
     try {
@@ -56,7 +70,12 @@ const RegisterPage = () => {
       if (err.code === 'ECONNABORTED' || !err.response) {
         toast.error('Server is waking up — please wait 30 seconds and try again.');
       } else {
-        toast.error(err.response?.data?.message || 'Registration failed. Please try again.');
+        const msg = err.response?.data?.message || '';
+        if (msg.toLowerCase().includes('phone') || msg.toLowerCase().includes('duplicate')) {
+          toast.error('This phone number is already registered. Please login instead.');
+        } else {
+          toast.error(msg || 'Registration failed. Please try again.');
+        }
       }
     } finally {
       setLoading(false);
@@ -73,31 +92,22 @@ const RegisterPage = () => {
       position: 'relative', overflow: 'hidden',
     }}>
 
-      {/* Background glows */}
       <div style={{ position: 'absolute', top: -80, right: -80, width: 320, height: 320, borderRadius: '50%', background: 'radial-gradient(circle, rgba(30,123,59,.3) 0%, transparent 70%)', pointerEvents: 'none' }} />
       <div style={{ position: 'absolute', bottom: -80, left: -80, width: 280, height: 280, borderRadius: '50%', background: 'radial-gradient(circle, rgba(245,158,11,.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
-      {/* Back */}
       <button onClick={() => navigate('/')}
-        style={{ position: 'absolute', top: 20, left: 20, background: 'rgba(255,255,255,.08)', border: '1px solid rgba(255,255,255,.15)', borderRadius: 10, padding: '8px 14px', color: 'rgba(255,255,255,.7)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', backdropFilter: 'blur(8px)' }}>
+        style={{ position: 'absolute', top: 20, left: 20, background: 'rgba(255,255,255,.08)', border: '1px solid rgba(255,255,255,.15)', borderRadius: 10, padding: '8px 14px', color: 'rgba(255,255,255,.7)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
         ← Back
       </button>
 
-      {/* Logo + brand */}
       <div style={{ textAlign: 'center', marginBottom: 24, position: 'relative', zIndex: 10 }}>
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12, filter: 'drop-shadow(0 4px 16px rgba(0,0,0,.4))' }}>
-          <Logo />
-        </div>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12, filter: 'drop-shadow(0 4px 16px rgba(0,0,0,.4))' }}><Logo /></div>
         <div style={{ fontSize: 24, fontWeight: 900, color: 'white', letterSpacing: '-0.5px', marginBottom: 4 }}>Local Connect</div>
         <div style={{ fontSize: 13, color: 'rgba(255,255,255,.5)', fontWeight: 500 }}>One Place for Everything</div>
       </div>
 
-      {/* Card */}
-      <div style={{
-        width: '100%', maxWidth: 400, position: 'relative', zIndex: 10,
-        background: 'white', borderRadius: 24, padding: '32px 28px',
-        boxShadow: '0 24px 80px rgba(0,0,0,.4)',
-      }}>
+      <div style={{ width: '100%', maxWidth: 400, position: 'relative', zIndex: 10, background: 'white', borderRadius: 24, padding: '32px 28px', boxShadow: '0 24px 80px rgba(0,0,0,.4)' }}>
+
         <div style={{ marginBottom: 22 }}>
           <div style={{ fontSize: 20, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.3px', marginBottom: 4 }}>Create account ✨</div>
           <div style={{ fontSize: 13, color: '#94A3B8' }}>Join your community on Local Connect</div>
@@ -105,21 +115,18 @@ const RegisterPage = () => {
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-          {/* Role picker */}
+          {/* Role */}
           <div>
-            <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#475569', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '.04em' }}>
-              I am a
-            </label>
+            <label style={lbl}>I am a</label>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
               {roles.map(r => (
-                <button key={r.id} type="button" onClick={() => setForm({ ...form, role: r.id })}
+                <button key={r.id} type="button" onClick={() => setForm(f => ({ ...f, role: r.id }))}
                   style={{
-                    padding: '12px 10px', borderRadius: 12, fontFamily: 'inherit',
-                    cursor: 'pointer', textAlign: 'center',
+                    padding: '12px 10px', borderRadius: 12, fontFamily: 'inherit', cursor: 'pointer', textAlign: 'center',
                     border: form.role === r.id ? '2px solid #1E7B3B' : '2px solid #E2E8F0',
                     background: form.role === r.id ? '#F0FDF4' : 'white',
-                    transition: 'all .15s',
                     boxShadow: form.role === r.id ? '0 0 0 3px rgba(30,123,59,.1)' : 'none',
+                    transition: 'all .15s',
                   }}>
                   <div style={{ fontSize: 22, marginBottom: 4 }}>{r.icon}</div>
                   <div style={{ fontSize: 13, fontWeight: 700, color: form.role === r.id ? '#1E7B3B' : '#0F172A' }}>{r.label}</div>
@@ -129,59 +136,65 @@ const RegisterPage = () => {
             </div>
           </div>
 
-          {/* Name */}
+          {/* Phone */}
           <div>
-            <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#475569', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.04em' }}>
-              Your Name
-            </label>
+            <label style={lbl}>Phone Number</label>
+            <div style={{ position: 'relative' }}>
+              <div style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', fontSize: 13, color: '#64748B', fontWeight: 600 }}>+91</div>
+              <input
+                type="tel" name="phone" value={form.phone}
+                onChange={handleChange} placeholder="10-digit mobile number" required maxLength={10}
+                style={{ ...inp, paddingLeft: 46, borderColor: phoneError ? '#EF4444' : '#E2E8F0' }}
+                onFocus={focus} onBlur={blur}
+              />
+            </div>
+            {phoneError && <div style={{ fontSize: 11, color: '#EF4444', marginTop: 4, fontWeight: 600 }}>{phoneError}</div>}
+          </div>
+
+          {/* Username */}
+          <div>
+            <label style={lbl}>Username</label>
             <input
               type="text" name="name" value={form.name}
-              onChange={handleChange} placeholder="Enter your full name" required
-              style={inputStyle}
-              onFocus={e => { e.target.style.borderColor = '#1E7B3B'; e.target.style.background = 'white'; e.target.style.boxShadow = '0 0 0 3px rgba(30,123,59,.12)'; }}
-              onBlur={e => { e.target.style.borderColor = '#E2E8F0'; e.target.style.background = '#F8FAFC'; e.target.style.boxShadow = 'none'; }}
+              onChange={handleChange} placeholder="Choose a username (min 3 chars)" required
+              style={inp} onFocus={focus} onBlur={blur}
             />
+            <div style={{ fontSize: 10, color: '#94A3B8', marginTop: 4 }}>This is how you'll login and appear on Local Connect</div>
           </div>
 
           {/* Password */}
           <div>
-            <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#475569', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.04em' }}>
-              Password
-            </label>
+            <label style={lbl}>Password</label>
             <div style={{ position: 'relative' }}>
               <input
                 type={show ? 'text' : 'password'} name="password" value={form.password}
                 onChange={handleChange} placeholder="Min 6 characters" required
-                style={{ ...inputStyle, paddingRight: 46 }}
-                onFocus={e => { e.target.style.borderColor = '#1E7B3B'; e.target.style.background = 'white'; e.target.style.boxShadow = '0 0 0 3px rgba(30,123,59,.12)'; }}
-                onBlur={e => { e.target.style.borderColor = '#E2E8F0'; e.target.style.background = '#F8FAFC'; e.target.style.boxShadow = 'none'; }}
+                style={{ ...inp, paddingRight: 46 }}
+                onFocus={focus} onBlur={blur}
               />
               <button type="button" onClick={() => setShow(!show)}
                 style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: '#94A3B8' }}>
                 {show ? '🙈' : '👁'}
               </button>
             </div>
+            {form.password.length > 0 && (
+              <div style={{ marginTop: 8 }}>
+                <div style={{ display: 'flex', gap: 4, marginBottom: 4 }}>
+                  {[1,2,3,4].map(i => (
+                    <div key={i} style={{
+                      flex: 1, height: 3, borderRadius: 2,
+                      background: form.password.length >= i * 2
+                        ? (form.password.length >= 8 ? '#1E7B3B' : form.password.length >= 6 ? '#F59E0B' : '#EF4444')
+                        : '#E2E8F0',
+                    }} />
+                  ))}
+                </div>
+                <div style={{ fontSize: 10, color: form.password.length >= 8 ? '#1E7B3B' : form.password.length >= 6 ? '#D97706' : '#EF4444', fontWeight: 600 }}>
+                  {form.password.length >= 8 ? 'Strong password' : form.password.length >= 6 ? 'Good — could be stronger' : 'Too short (min 6 chars)'}
+                </div>
+              </div>
+            )}
           </div>
-
-          {/* Password strength */}
-          {form.password.length > 0 && (
-            <div style={{ marginTop: -8 }}>
-              <div style={{ display: 'flex', gap: 4, marginBottom: 4 }}>
-                {[1,2,3,4].map(i => (
-                  <div key={i} style={{
-                    flex: 1, height: 3, borderRadius: 2,
-                    background: form.password.length >= i * 2
-                      ? (form.password.length >= 8 ? '#1E7B3B' : form.password.length >= 6 ? '#F59E0B' : '#EF4444')
-                      : '#E2E8F0',
-                    transition: 'background .2s',
-                  }} />
-                ))}
-              </div>
-              <div style={{ fontSize: 10, color: form.password.length >= 8 ? '#1E7B3B' : form.password.length >= 6 ? '#D97706' : '#EF4444', fontWeight: 600 }}>
-                {form.password.length >= 8 ? 'Strong password' : form.password.length >= 6 ? 'Good — could be stronger' : 'Too short (min 6 chars)'}
-              </div>
-            </div>
-          )}
 
           <button type="submit" disabled={loading}
             style={{
@@ -190,24 +203,19 @@ const RegisterPage = () => {
               color: 'white', fontWeight: 800, fontSize: 15,
               cursor: loading ? 'not-allowed' : 'pointer',
               boxShadow: loading ? 'none' : '0 6px 20px rgba(30,123,59,.4)',
-              fontFamily: 'inherit', letterSpacing: '-0.2px', marginTop: 4,
+              fontFamily: 'inherit', marginTop: 4,
             }}>
             {loading ? 'Creating account...' : 'Create Account — It\'s Free →'}
           </button>
         </form>
 
-        {/* Terms note */}
         <div style={{ marginTop: 12, textAlign: 'center' }}>
-          <div style={{ fontSize: 11, color: '#CBD5E1', lineHeight: 1.5 }}>
-            By signing up, you agree to our Terms of Service
-          </div>
+          <div style={{ fontSize: 11, color: '#CBD5E1', lineHeight: 1.5 }}>By signing up you agree to our Terms of Service</div>
         </div>
 
         <div style={{ marginTop: 18, paddingTop: 18, borderTop: '1px solid #F1F5F9', textAlign: 'center' }}>
           <span style={{ fontSize: 14, color: '#94A3B8' }}>Already have an account? </span>
-          <Link to="/login" style={{ fontSize: 14, fontWeight: 700, color: '#1E7B3B', textDecoration: 'none' }}>
-            Login →
-          </Link>
+          <Link to="/login" style={{ fontSize: 14, fontWeight: 700, color: '#1E7B3B', textDecoration: 'none' }}>Login →</Link>
         </div>
       </div>
 
