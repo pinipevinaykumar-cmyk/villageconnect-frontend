@@ -50,9 +50,14 @@ const ShopListPage = () => {
     finally { setLoading(false); }
   };
 
-  const displayed = filterStatus === 'open'
-    ? shops.filter(s => s.currentStatus === 'OPEN')
+  // Client-side village filter as fallback (backend may ignore the param)
+  const villageFiltered = village
+    ? shops.filter(s => (s.village || '').toLowerCase().trim() === village.toLowerCase().trim())
     : shops;
+
+  const displayed = filterStatus === 'open'
+    ? villageFiltered.filter(s => s.currentStatus === 'OPEN')
+    : villageFiltered;
 
   return (
     <div style={{ background: 'var(--bg)', minHeight: '100vh', paddingBottom: 90 }}>
@@ -69,10 +74,10 @@ const ShopListPage = () => {
           </button>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 18, fontWeight: 800, color: 'white' }}>
-              {village || 'All India'}
+              {village || 'All Andhra Pradesh'}
             </div>
             <div style={{ fontSize: 12, color: 'rgba(255,255,255,.65)', marginTop: 2 }}>
-              {loading ? 'Loading...' : `${displayed.length} shops found`}
+              {loading ? 'Loading...' : `${displayed.length} listing${displayed.length !== 1 ? 's' : ''} found`}
             </div>
           </div>
           <button onClick={() => setFilterOpen(f => !f)}

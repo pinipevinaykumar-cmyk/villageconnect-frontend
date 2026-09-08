@@ -111,9 +111,11 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
+  const [categories, setCategories] = useState([]);
+
   useEffect(() => {
     Promise.all([API.get('/public/shops'), API.get('/public/categories')])
-      .then(([s]) => { setShops(s.data.data || []); })
+      .then(([s, c]) => { setShops(s.data.data || []); setCategories(c.data.data || []); })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
@@ -144,6 +146,11 @@ const HomePage = () => {
     ? shops.filter(s => (s.village || '').toLowerCase().trim() === locationName)
     : shops;
   const openShops = nearbyShops.filter(s => s.currentStatus === 'OPEN');
+
+  // Categories that actually have shops in this location
+  const localCategories = categories
+    .map(cat => ({ ...cat, count: nearbyShops.filter(s => s.category?.id === cat.id).length }))
+    .filter(cat => cat.count > 0);
 
   return (
     <div style={{ background: 'var(--bg)', minHeight: '100vh', paddingBottom: 90 }}>
@@ -191,14 +198,17 @@ const HomePage = () => {
         </div>
       </div>
 
-      {/* NEARBY BUSINESSES */}
+      {/* EXPLORE LOCATION — category tiles */}
       <div style={S.sectionWrap}>
         <div style={S.sectionHead}>
           <div style={S.sectionTitle}>
-            {location?.name ? `Businesses in ${location.name}` : 'Nearby Businesses'}
+            {location?.name ? `Explore ${location.name}` : 'Explore Nearby'}
           </div>
-          <div style={S.seeAll} onClick={() => navigate('/shops')}>View All <ChevronRight size={13} /></div>
+          <div style={S.seeAll} onClick={() => navigate(location?.name ? `/shops?village=${encodeURIComponent(location.name)}` : '/shops')}>
+            View All <ChevronRight size={13} />
+          </div>
         </div>
+
         {loading ? (
           <div style={{ textAlign: 'center', padding: '24px 0', color: 'var(--text-3)', fontSize: 13 }}>Loading...</div>
         ) : nearbyShops.length === 0 ? (
@@ -208,7 +218,7 @@ const HomePage = () => {
               Coming soon to {location?.name || 'your area'}!
             </div>
             <div style={{ fontSize: 12, color: 'var(--text-3)', lineHeight: 1.6 }}>
-              No businesses registered here yet.<br />Be the first to list your shop!
+              No businesses registered here yet.<br />Be the first to list your business!
             </div>
             <button onClick={() => navigate('/register')} style={{
               marginTop: 14, background: 'var(--primary)', color: 'white', border: 'none',
@@ -217,7 +227,32 @@ const HomePage = () => {
             }}>Register your Business →</button>
           </div>
         ) : (
-          nearbyShops.slice(0, 4).map(shop => <ShopRow key={shop.id} shop={shop} />)
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 10 }}>
+            {localCategories.map(cat => (
+              <div key={cat.id}
+                onClick={() => navigate(`/shops?categoryId=${cat.id}&village=${encodeURIComponent(location?.name || '')}`)}
+                style={{
+                  background: 'var(--card)', borderRadius: 14, border: '1px solid var(--border)',
+                  boxShadow: 'var(--shadow-sm)', padding: '16px 14px',
+                  cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12,
+                }}>
+                <div style={{
+                  width: 48, height: 48, borderRadius: 13, background: 'var(--green-50)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 26, flexShrink: 0,
+                }}>
+                  {cat.icon || '🏪'}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', lineHeight: 1.3 }}>{cat.name}</div>
+                  <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 3 }}>
+                    {cat.count} {cat.count === 1 ? 'listing' : 'listings'}
+                  </div>
+                </div>
+                <span style={{ color: 'var(--text-3)', fontSize: 16, flexShrink: 0 }}>›</span>
+              </div>
+            ))}
+          </div>
         )}
       </div>
 
