@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import API from '../api/axios';
+
+const LOC_API = 'https://local-connect-v2-backend.onrender.com/locations';
 
 const Logo = () => (
   <svg width="44" height="44" viewBox="0 0 62 74" fill="none">
@@ -28,8 +30,15 @@ const inp = {
   outline: 'none', fontFamily: 'inherit', background: '#F8FAFC',
   transition: 'all .15s',
 };
+const sel = {
+  ...inp,
+  appearance: 'none', WebkitAppearance: 'none',
+  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%2364748B' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E")`,
+  backgroundRepeat: 'no-repeat',
+  backgroundPosition: 'right 14px center',
+  paddingRight: 36, cursor: 'pointer',
+};
 const lbl = { display: 'block', fontSize: 12, fontWeight: 700, color: '#475569', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.04em' };
-
 const focus = e => { e.target.style.borderColor = '#1E7B3B'; e.target.style.background = 'white'; e.target.style.boxShadow = '0 0 0 3px rgba(30,123,59,.12)'; };
 const blur  = e => { e.target.style.borderColor = '#E2E8F0'; e.target.style.background = '#F8FAFC'; e.target.style.boxShadow = 'none'; };
 
@@ -41,8 +50,48 @@ const RegisterPage = () => {
   const [loading, setLoading] = useState(false);
   const [show, setShow] = useState(false);
   const [phoneError, setPhoneError] = useState('');
+
+  // Location state
+  const [districts, setDistricts] = useState([]);
+  const [mandals, setMandals]     = useState([]);
+  const [villages, setVillages]   = useState([]);
+  const [districtId, setDistrictId] = useState('');
+  const [mandalId, setMandalId]     = useState('');
+  const [villageId, setVillageId]   = useState('');
+  const [villageName, setVillageName] = useState('');
+  const [locLoading, setLocLoading]   = useState(true);
+
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  // Fetch districts on mount
+  useEffect(() => {
+    fetch(`${LOC_API}/districts`)
+      .then(r => r.json())
+      .then(d => setDistricts(d.data || []))
+      .catch(() => {})
+      .finally(() => setLocLoading(false));
+  }, []);
+
+  // Fetch mandals when district changes
+  useEffect(() => {
+    if (!districtId) { setMandals([]); setMandalId(''); setVillages([]); setVillageId(''); return; }
+    fetch(`${LOC_API}/districts/${districtId}/mandals`)
+      .then(r => r.json())
+      .then(d => setMandals(d.data || []))
+      .catch(() => {});
+    setMandalId(''); setVillages([]); setVillageId('');
+  }, [districtId]);
+
+  // Fetch villages when mandal changes
+  useEffect(() => {
+    if (!mandalId) { setVillages([]); setVillageId(''); return; }
+    fetch(`${LOC_API}/mandals/${mandalId}/villages`)
+      .then(r => r.json())
+      .then(d => setVillages(d.data || []))
+      .catch(() => {});
+    setVillageId('');
+  }, [mandalId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -53,19 +102,32 @@ const RegisterPage = () => {
     }
   };
 
+  const handleVillageChange = (e) => {
+    const id = e.target.value;
+    setVillageId(id);
+    const v = villages.find(v => String(v.id) === String(id));
+    setVillageName(v ? v.name : '');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!districtId) { toast.error('Please select a district'); return; }
+    if (!mandalId)   { toast.error('Please select a mandal'); return; }
+    if (!villageId)  { toast.error('Please select a village / town'); return; }
     if (!form.phone.trim() || !/^\d+$/.test(form.phone)) { toast.error('Enter a valid phone number (digits only)'); return; }
     if (form.name.trim().length < 3) { toast.error('Username must be at least 3 characters'); return; }
     if (form.password.length < 6) { toast.error('Password must be at least 6 characters'); return; }
+
     setLoading(true);
     try {
       const res = await API.post('/auth/register', form);
       const { token, ...userData } = res.data.data;
       login(userData, token);
-      toast.success('Welcome to Local Connect! 🎉');
+      // Save location to localStorage so home page is pre-filtered
+      localStorage.setItem('location', JSON.stringify({ name: villageName, id: villageId }));
+      toast.success('Welcome to Local Connect!');
       if (userData.role === 'MERCHANT') navigate('/merchant/add-shop');
-      else navigate('/location');
+      else navigate('/home');
     } catch (err) {
       if (err.code === 'ECONNABORTED' || !err.response) {
         toast.error('Server is waking up — please wait 30 seconds and try again.');
@@ -82,6 +144,10 @@ const RegisterPage = () => {
     }
   };
 
+  const pwStrength = form.password.length >= 8 ? { label: 'Strong', color: '#1E7B3B', bars: 4 }
+    : form.password.length >= 6 ? { label: 'Good', color: '#F59E0B', bars: 2 }
+    : { label: 'Too short (min 6)', color: '#EF4444', bars: 1 };
+
   return (
     <div style={{
       minHeight: '100vh',
@@ -91,7 +157,6 @@ const RegisterPage = () => {
       fontFamily: "'Inter', -apple-system, sans-serif",
       position: 'relative', overflow: 'hidden',
     }}>
-
       <div style={{ position: 'absolute', top: -80, right: -80, width: 320, height: 320, borderRadius: '50%', background: 'radial-gradient(circle, rgba(30,123,59,.3) 0%, transparent 70%)', pointerEvents: 'none' }} />
       <div style={{ position: 'absolute', bottom: -80, left: -80, width: 280, height: 280, borderRadius: '50%', background: 'radial-gradient(circle, rgba(245,158,11,.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
@@ -106,7 +171,7 @@ const RegisterPage = () => {
         <div style={{ fontSize: 13, color: 'rgba(255,255,255,.5)', fontWeight: 500 }}>One Place for Everything</div>
       </div>
 
-      <div style={{ width: '100%', maxWidth: 400, position: 'relative', zIndex: 10, background: 'white', borderRadius: 24, padding: '32px 28px', boxShadow: '0 24px 80px rgba(0,0,0,.4)' }}>
+      <div style={{ width: '100%', maxWidth: 420, position: 'relative', zIndex: 10, background: 'white', borderRadius: 24, padding: '32px 28px', boxShadow: '0 24px 80px rgba(0,0,0,.4)' }}>
 
         <div style={{ marginBottom: 22 }}>
           <div style={{ fontSize: 20, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.3px', marginBottom: 4 }}>Create account ✨</div>
@@ -134,6 +199,52 @@ const RegisterPage = () => {
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* State — read only */}
+          <div>
+            <label style={lbl}>State</label>
+            <div style={{ ...inp, display: 'flex', alignItems: 'center', gap: 8, background: '#F0FDF4', border: '1.5px solid #A7F3D0', color: '#1E7B3B', fontWeight: 700 }}>
+              <span style={{ fontSize: 16 }}>📍</span> Andhra Pradesh
+            </div>
+          </div>
+
+          {/* District */}
+          <div>
+            <label style={lbl}>District</label>
+            <select value={districtId} onChange={e => setDistrictId(e.target.value)}
+              style={{ ...sel, borderColor: districtId ? '#1E7B3B' : '#E2E8F0', background: districtId ? 'white' : '#F8FAFC' }}
+              onFocus={focus} onBlur={blur}>
+              <option value="">{locLoading ? 'Loading districts...' : 'Select District'}</option>
+              {districts.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+            </select>
+          </div>
+
+          {/* Mandal */}
+          <div>
+            <label style={lbl}>Mandal</label>
+            <select value={mandalId} onChange={e => setMandalId(e.target.value)}
+              disabled={!districtId || mandals.length === 0}
+              style={{ ...sel, borderColor: mandalId ? '#1E7B3B' : '#E2E8F0', background: mandalId ? 'white' : '#F8FAFC', opacity: !districtId ? 0.55 : 1 }}
+              onFocus={focus} onBlur={blur}>
+              <option value="">{!districtId ? 'Select district first' : mandals.length === 0 ? 'Loading mandals...' : 'Select Mandal'}</option>
+              {mandals.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
+            </select>
+          </div>
+
+          {/* Village */}
+          <div>
+            <label style={lbl}>Village / Town</label>
+            <select value={villageId} onChange={handleVillageChange}
+              disabled={!mandalId || villages.length === 0}
+              style={{ ...sel, borderColor: villageId ? '#1E7B3B' : '#E2E8F0', background: villageId ? 'white' : '#F8FAFC', opacity: !mandalId ? 0.55 : 1 }}
+              onFocus={focus} onBlur={blur}>
+              <option value="">{!mandalId ? 'Select mandal first' : villages.length === 0 ? 'Loading villages...' : 'Select Village / Town'}</option>
+              {villages.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
+            </select>
+            {villageName && (
+              <div style={{ fontSize: 11, color: '#1E7B3B', marginTop: 5, fontWeight: 600 }}>📍 {villageName}, Andhra Pradesh</div>
+            )}
           </div>
 
           {/* Phone */}
@@ -181,17 +292,10 @@ const RegisterPage = () => {
               <div style={{ marginTop: 8 }}>
                 <div style={{ display: 'flex', gap: 4, marginBottom: 4 }}>
                   {[1,2,3,4].map(i => (
-                    <div key={i} style={{
-                      flex: 1, height: 3, borderRadius: 2,
-                      background: form.password.length >= i * 2
-                        ? (form.password.length >= 8 ? '#1E7B3B' : form.password.length >= 6 ? '#F59E0B' : '#EF4444')
-                        : '#E2E8F0',
-                    }} />
+                    <div key={i} style={{ flex: 1, height: 3, borderRadius: 2, background: i <= pwStrength.bars ? pwStrength.color : '#E2E8F0', transition: 'background .2s' }} />
                   ))}
                 </div>
-                <div style={{ fontSize: 10, color: form.password.length >= 8 ? '#1E7B3B' : form.password.length >= 6 ? '#D97706' : '#EF4444', fontWeight: 600 }}>
-                  {form.password.length >= 8 ? 'Strong password' : form.password.length >= 6 ? 'Good — could be stronger' : 'Too short (min 6 chars)'}
-                </div>
+                <div style={{ fontSize: 10, color: pwStrength.color, fontWeight: 600 }}>{pwStrength.label}</div>
               </div>
             )}
           </div>
@@ -205,7 +309,7 @@ const RegisterPage = () => {
               boxShadow: loading ? 'none' : '0 6px 20px rgba(30,123,59,.4)',
               fontFamily: 'inherit', marginTop: 4,
             }}>
-            {loading ? 'Creating account...' : 'Create Account — It\'s Free →'}
+            {loading ? 'Creating account...' : "Create Account — It's Free →"}
           </button>
         </form>
 
