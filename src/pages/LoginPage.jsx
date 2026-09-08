@@ -45,7 +45,11 @@ const LoginPage = () => {
       else if (userData.role === 'ADMIN') navigate('/admin');
       else navigate('/home');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Login failed');
+      if (err.code === 'ECONNABORTED' || !err.response) {
+        toast.error('Server is waking up — please wait 30 seconds and try again.');
+      } else {
+        toast.error(err.response?.data?.message || 'Login failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }

@@ -53,7 +53,11 @@ const RegisterPage = () => {
       if (userData.role === 'MERCHANT') navigate('/merchant/add-shop');
       else navigate('/home');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Registration failed. Try again in 30 seconds.');
+      if (err.code === 'ECONNABORTED' || !err.response) {
+        toast.error('Server is waking up — please wait 30 seconds and try again.');
+      } else {
+        toast.error(err.response?.data?.message || 'Registration failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
