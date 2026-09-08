@@ -43,7 +43,10 @@ const LoginPage = () => {
       toast.success(`Welcome back, ${userData.name}!`);
       if (userData.role === 'MERCHANT') navigate('/merchant/dashboard');
       else if (userData.role === 'ADMIN') navigate('/admin');
-      else navigate('/home');
+      else {
+        const hasLocation = localStorage.getItem('location');
+        navigate(hasLocation ? '/home' : '/location');
+      }
     } catch (err) {
       if (err.code === 'ECONNABORTED' || !err.response) {
         toast.error('Server is waking up — please wait 30 seconds and try again.');

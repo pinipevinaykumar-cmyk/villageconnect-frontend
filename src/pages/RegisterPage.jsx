@@ -51,7 +51,7 @@ const RegisterPage = () => {
       login(userData, token);
       toast.success('Welcome to Local Connect! 🎉');
       if (userData.role === 'MERCHANT') navigate('/merchant/add-shop');
-      else navigate('/home');
+      else navigate('/location');
     } catch (err) {
       if (err.code === 'ECONNABORTED' || !err.response) {
         toast.error('Server is waking up — please wait 30 seconds and try again.');

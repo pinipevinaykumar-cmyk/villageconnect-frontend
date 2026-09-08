@@ -11,7 +11,7 @@ const Navbar = () => {
   const drawerRef = useRef(null);
 
   // Hide on auth and landing pages
-  if (pathname === '/' || pathname === '/login' || pathname.startsWith('/register')) return null;
+  if (pathname === '/' || pathname === '/login' || pathname.startsWith('/register') || pathname === '/location') return null;
 
   const handleLogout = () => { setMenuOpen(false); logout(); navigate('/'); };
 

@@ -1,18 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, ChevronRight, Phone } from 'lucide-react';
+import { Search, ChevronRight, Phone, Bell } from 'lucide-react';
+import toast from 'react-hot-toast';
 import API from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 
 const QUICK_ACTIONS = [
-  { icon: '🏥', label: 'Healthcare', path: '/shops?categoryId=4' },
-  { icon: '🏫', label: 'Education',  path: '/shops' },
   { icon: '🏪', label: 'Businesses', path: '/shops' },
-  { icon: '⚽', label: 'Sports',     path: '/shops' },
-  { icon: '📅', label: 'Events',     path: '/shops' },
-  { icon: '🛠', label: 'Services',   path: '/shops' },
-  { icon: '📢', label: 'Community',  path: '/shops' },
-  { icon: '🚨', label: 'Emergency',  path: '/shops' },
+  { icon: '🏥', label: 'Healthcare', path: '/healthcare' },
+  { icon: '🛠', label: 'Services',   path: '/services' },
+  { icon: '📢', label: 'Community',  path: '/community' },
+  { icon: '🔍', label: 'Discover',   path: '/discover' },
+  { icon: '📞', label: 'Emergency',  path: null, action: 'emergency' },
+  { icon: '🟢', label: 'Open Now',   path: '/shops?status=open' },
+  { icon: '👤', label: 'My Profile', path: null, action: 'profile' },
+];
+
+const COMMUNITY_POSTS = [
+  { id: 1, icon: '🩸', title: 'Blood Donors Needed', sub: 'B+ required at GGH · Urgent', badge: 'Urgent', badgeBg: '#FEE2E2', badgeColor: '#DC2626' },
+  { id: 2, icon: '📢', title: 'Road Closure Alert',  sub: 'MG Road closed until Friday',  badge: 'Alert',  badgeBg: '#FEF3C7', badgeColor: '#D97706' },
+  { id: 3, icon: '🤝', title: 'Volunteer Drive',     sub: 'Town Park cleanup Sunday 7AM', badge: 'Event',  badgeBg: '#EFF6FF', badgeColor: '#3B82F6' },
 ];
 
 const S = {
@@ -21,6 +28,7 @@ const S = {
     padding: '52px 18px 24px',
     color: 'white',
   },
+  heroRow: { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' },
   greeting:   { fontSize: 13, color: 'rgba(255,255,255,.75)', fontWeight: 500 },
   name:       { fontSize: 24, fontWeight: 900, marginTop: 2, letterSpacing: '-.5px' },
   locationPill: {
@@ -34,21 +42,10 @@ const S = {
     display: 'flex', alignItems: 'center', gap: 10, marginTop: 16,
     boxShadow: '0 8px 24px rgba(0,0,0,.18)',
   },
-  searchText: { fontSize: 13, color: 'var(--text-3)', flex: 1 },
-
-  emergencyBanner: {
-    margin: '16px 16px 0',
-    background: 'linear-gradient(135deg, #EF4444, #DC2626)',
-    borderRadius: 14, padding: '14px 16px',
-    display: 'flex', alignItems: 'center', gap: 12,
-    boxShadow: '0 6px 20px rgba(239,68,68,.3)',
-  },
-
   sectionWrap:  { padding: '20px 16px 0' },
   sectionHead:  { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 },
   sectionTitle: { fontSize: 16, fontWeight: 800, color: 'var(--text)' },
   seeAll:       { fontSize: 12, color: 'var(--primary)', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 2 },
-
   qaGrid: { display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10 },
   qaItem: {
     background: 'var(--card)', borderRadius: 14, padding: '14px 6px 12px',
@@ -57,7 +54,6 @@ const S = {
   },
   qaIcon:  { fontSize: 24, lineHeight: 1, marginBottom: 6 },
   qaLabel: { fontSize: 9.5, fontWeight: 600, color: 'var(--text-2)', lineHeight: 1.3 },
-
   shopRow: {
     background: 'var(--card)', borderRadius: 14, padding: '14px',
     display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10,
@@ -70,23 +66,12 @@ const S = {
   },
   shopName: { fontSize: 13, fontWeight: 700, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
   shopMeta: { fontSize: 11, color: 'var(--text-3)', marginTop: 3 },
-
   badge: (open) => ({
     display: 'inline-flex', alignItems: 'center', gap: 4,
     padding: '2px 9px', borderRadius: 100, fontSize: 10, fontWeight: 700, marginTop: 3,
     background: open ? 'var(--green-100)' : 'var(--red-light)',
     color: open ? '#15803D' : 'var(--red)',
   }),
-
-  eventCard: {
-    background: 'var(--card)', borderRadius: 14, overflow: 'hidden',
-    boxShadow: 'var(--shadow-sm)', border: '1px solid var(--border)',
-    width: 180, flexShrink: 0,
-  },
-  eventImg: {
-    height: 92, background: 'linear-gradient(135deg, var(--primary), var(--accent))',
-    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 34,
-  },
 };
 
 const ShopRow = ({ shop }) => {
@@ -121,36 +106,59 @@ const ShopRow = ({ shop }) => {
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const [shops, setShops]         = useState([]);
-  const [categories, setCategories] = useState([]);
+  const { user, location } = useAuth();
+  const [shops, setShops] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading]     = useState(true);
 
   useEffect(() => {
     Promise.all([API.get('/public/shops'), API.get('/public/categories')])
-      .then(([s, c]) => { setShops(s.data.data || []); setCategories(c.data.data || []); })
+      .then(([s]) => { setShops(s.data.data || []); })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
 
   const handleSearch = e => {
     e.preventDefault();
-    navigate(`/shops?q=${searchTerm}`);
+    if (searchTerm.trim()) navigate(`/discover?q=${encodeURIComponent(searchTerm)}`);
+  };
+
+  const handleQuickAction = (a) => {
+    if (a.action === 'emergency') {
+      toast('Call 112 for Police · 108 for Ambulance · 101 for Fire', { icon: '🚨', duration: 5000, style: { fontFamily: 'Inter, sans-serif', fontWeight: 600 } });
+      return;
+    }
+    if (a.action === 'profile') {
+      toast(`Logged in as ${user?.name || 'User'} (${user?.role})`, { icon: '👤', style: { fontFamily: 'Inter, sans-serif' } });
+      return;
+    }
+    navigate(a.path);
   };
 
   const firstName = user?.name?.split(' ')[0] || 'there';
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  const openShops = shops.filter(s => s.currentStatus === 'OPEN');
 
   return (
     <div style={{ background: 'var(--bg)', minHeight: '100vh', paddingBottom: 90 }}>
 
-      {/* ── HERO ── */}
+      {/* HERO */}
       <div style={S.hero}>
-        <div style={S.greeting}>{greeting} 👋</div>
-        <div style={S.name}>{firstName}</div>
-        <div style={S.locationPill}>📍 All India</div>
+        <div style={S.heroRow}>
+          <div>
+            <div style={S.greeting}>{greeting} 👋</div>
+            <div style={S.name}>{firstName}</div>
+            <div style={S.locationPill} onClick={() => navigate('/location')}>
+              📍 {location?.name || 'Select Location'}
+            </div>
+          </div>
+          <button
+            style={{ background: 'rgba(255,255,255,.15)', border: 'none', borderRadius: 12, width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', marginTop: 4 }}
+            onClick={() => toast('Notifications coming soon!', { icon: '🔔' })}>
+            <Bell size={18} color="white" />
+          </button>
+        </div>
         <form onSubmit={handleSearch}>
           <div style={S.searchBox}>
             <Search size={16} color="var(--text-3)" />
@@ -159,31 +167,18 @@ const HomePage = () => {
               placeholder="What are you looking for today?"
               style={{ flex: 1, border: 'none', outline: 'none', fontSize: 13, color: 'var(--text)', background: 'transparent', fontFamily: 'inherit' }}
             />
-            <span style={{ fontSize: 18, cursor: 'pointer' }}>🎙</span>
           </div>
         </form>
       </div>
 
-      {/* ── EMERGENCY BANNER ── */}
-      <div style={S.emergencyBanner}>
-        <span style={{ fontSize: 24 }}>🩸</span>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 13, fontWeight: 800, color: 'white' }}>Urgent: Blood Donors Needed</div>
-          <div style={{ fontSize: 11, color: 'rgba(255,255,255,.8)', marginTop: 2 }}>B+ required at GGH · Call 108</div>
-        </div>
-        <button style={{ background: 'white', color: '#DC2626', borderRadius: 100, padding: '6px 14px', fontSize: 11, fontWeight: 700, border: 'none', cursor: 'pointer' }}>
-          Help Now
-        </button>
-      </div>
-
-      {/* ── QUICK ACTIONS ── */}
+      {/* QUICK ACCESS */}
       <div style={S.sectionWrap}>
         <div style={S.sectionHead}>
           <div style={S.sectionTitle}>Quick Access</div>
         </div>
         <div style={S.qaGrid}>
           {QUICK_ACTIONS.map(a => (
-            <div key={a.label} style={S.qaItem} onClick={() => navigate(a.path)}>
+            <div key={a.label} style={S.qaItem} onClick={() => handleQuickAction(a)}>
               <div style={S.qaIcon}>{a.icon}</div>
               <div style={S.qaLabel}>{a.label}</div>
             </div>
@@ -191,67 +186,69 @@ const HomePage = () => {
         </div>
       </div>
 
-      {/* ── SHOPS ── */}
+      {/* NEARBY BUSINESSES */}
       <div style={S.sectionWrap}>
         <div style={S.sectionHead}>
-          <div style={S.sectionTitle}>Shops in India</div>
+          <div style={S.sectionTitle}>Nearby Businesses</div>
           <div style={S.seeAll} onClick={() => navigate('/shops')}>View All <ChevronRight size={13} /></div>
         </div>
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '24px 0', color: 'var(--text-3)', fontSize: 13 }}>Loading shops...</div>
+          <div style={{ textAlign: 'center', padding: '24px 0', color: 'var(--text-3)', fontSize: 13 }}>Loading...</div>
         ) : shops.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '32px', background: 'var(--card)', borderRadius: 14, border: '1px solid var(--border)' }}>
             <div style={{ fontSize: 36, marginBottom: 10 }}>🏪</div>
-            <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-2)' }}>No shops yet</div>
-            <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 4 }}>Be the first to add a shop</div>
+            <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-2)' }}>No businesses yet</div>
           </div>
         ) : (
           shops.slice(0, 4).map(shop => <ShopRow key={shop.id} shop={shop} />)
         )}
       </div>
 
-      {/* ── CATEGORIES ── */}
-      {categories.length > 0 && (
+      {/* OPEN NOW */}
+      {openShops.length > 0 && (
         <div style={S.sectionWrap}>
           <div style={S.sectionHead}>
-            <div style={S.sectionTitle}>Popular Categories</div>
+            <div style={S.sectionTitle}>Open Now 🟢</div>
             <div style={S.seeAll} onClick={() => navigate('/shops')}>View All <ChevronRight size={13} /></div>
           </div>
-          <div style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 8 }} className="scroll-hide">
-            {categories.map(cat => (
-              <button key={cat.id}
-                onClick={() => navigate(`/shops?categoryId=${cat.id}`)}
-                style={{
-                  flexShrink: 0, width: 80, background: 'var(--card)', borderRadius: 14,
-                  border: '1px solid var(--border)', padding: '14px 6px 12px',
-                  cursor: 'pointer', textAlign: 'center', boxShadow: 'var(--shadow-sm)',
-                  fontFamily: 'inherit',
-                }}>
-                <div style={{ fontSize: 26, marginBottom: 6 }}>{cat.icon || '🏪'}</div>
-                <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-2)', lineHeight: 1.3 }}>{cat.name}</div>
-              </button>
-            ))}
+          <div style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 8 }} className="scroll-hide">
+            {openShops.slice(0, 3).map(shop => {
+              const isOpen = shop.currentStatus === 'OPEN';
+              return (
+                <div key={shop.id}
+                  onClick={() => navigate(`/shops/${shop.id}`)}
+                  style={{ background: 'var(--card)', borderRadius: 14, border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)', width: 160, flexShrink: 0, cursor: 'pointer', overflow: 'hidden' }}>
+                  <div style={{ height: 80, background: 'var(--green-50)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32 }}>
+                    {shop.imageUrl ? <img src={shop.imageUrl} alt={shop.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : shop.category?.icon || '🏪'}
+                  </div>
+                  <div style={{ padding: '10px 12px' }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{shop.name}</div>
+                    <div style={S.badge(isOpen)}><span style={{ width: 5, height: 5, borderRadius: '50%', background: 'currentColor', display: 'inline-block' }} /> Open</div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
 
-      {/* ── TODAY'S EVENTS ── */}
+      {/* COMMUNITY UPDATES */}
       <div style={S.sectionWrap}>
         <div style={S.sectionHead}>
-          <div style={S.sectionTitle}>Today in Your Area</div>
+          <div style={S.sectionTitle}>Community Updates</div>
+          <div style={S.seeAll} onClick={() => navigate('/community')}>View All <ChevronRight size={13} /></div>
         </div>
-        <div style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 8 }} className="scroll-hide">
-          {[
-            { emoji: '🏏', title: 'Cricket Tournament', time: 'Ground 1 · 6 AM' },
-            { emoji: '🎭', title: 'Cultural Program',   time: 'Town Hall · 7 PM' },
-            { emoji: '🩺', title: 'Free Health Camp',   time: 'PHC Centre · 9 AM' },
-          ].map(ev => (
-            <div key={ev.title} style={S.eventCard}>
-              <div style={S.eventImg}>{ev.emoji}</div>
-              <div style={{ padding: '10px 12px' }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)' }}>{ev.title}</div>
-                <div style={{ fontSize: 10, color: 'var(--text-3)', marginTop: 4 }}>Today · {ev.time}</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {COMMUNITY_POSTS.map(post => (
+            <div key={post.id}
+              onClick={() => navigate('/community')}
+              style={{ background: 'var(--card)', borderRadius: 14, padding: '14px 16px', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)', display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
+              <span style={{ fontSize: 28, flexShrink: 0 }}>{post.icon}</span>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', marginBottom: 2 }}>{post.title}</div>
+                <div style={{ fontSize: 11, color: 'var(--text-3)' }}>{post.sub}</div>
               </div>
+              <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 100, background: post.badgeBg, color: post.badgeColor }}>{post.badge}</span>
             </div>
           ))}
         </div>

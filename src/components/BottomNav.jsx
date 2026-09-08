@@ -4,9 +4,9 @@ import toast from 'react-hot-toast';
 
 const tabs = [
   { label: 'Home',      emoji: '🏠', path: '/home' },
-  { label: 'Discover',  emoji: '🔍', path: '/shops' },
-  { label: 'Community', emoji: '💬', path: null },
-  { label: 'Services',  emoji: '🛠', path: null },
+  { label: 'Discover',  emoji: '🔍', path: '/discover' },
+  { label: 'Community', emoji: '📢', path: '/community' },
+  { label: 'Services',  emoji: '🛠', path: '/services' },
   { label: 'Profile',   emoji: '👤', path: null },
 ];
 
@@ -16,10 +16,16 @@ const BottomNav = () => {
 
   const handleTab = (tab) => {
     if (!tab.path) {
-      toast('Coming soon! 🚀', { icon: '✨', style: { fontFamily: 'Inter, sans-serif', fontWeight: 600 } });
+      toast('Profile coming soon! 🚀', { icon: '✨', style: { fontFamily: 'Inter, sans-serif', fontWeight: 600 } });
       return;
     }
     navigate(tab.path);
+  };
+
+  const isActive = (tab) => {
+    if (!tab.path) return false;
+    if (tab.path === '/home') return pathname === '/home';
+    return pathname === tab.path || pathname.startsWith(tab.path);
   };
 
   return (
@@ -33,7 +39,7 @@ const BottomNav = () => {
       paddingBottom: 'env(safe-area-inset-bottom)',
     }}>
       {tabs.map(tab => {
-        const active = tab.path && (pathname === tab.path || (tab.path === '/shops' && pathname.startsWith('/shops')));
+        const active = isActive(tab);
         return (
           <button key={tab.label} onClick={() => handleTab(tab)}
             style={{
