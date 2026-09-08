@@ -1,20 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, ChevronRight, Phone, Bell } from 'lucide-react';
+import { Search, ChevronRight, Bell } from 'lucide-react';
 import toast from 'react-hot-toast';
 import API from '../api/axios';
 import { useAuth } from '../context/AuthContext';
-
-const QUICK_ACTIONS = [
-  { icon: '🏪', label: 'Businesses', path: '/shops' },
-  { icon: '🏥', label: 'Healthcare', path: '/healthcare' },
-  { icon: '🛠', label: 'Services',   path: '/services' },
-  { icon: '📢', label: 'Community',  path: '/community' },
-  { icon: '🔍', label: 'Discover',   path: '/discover' },
-  { icon: '📞', label: 'Emergency',  path: null, action: 'emergency' },
-  { icon: '🟢', label: 'Open Now',   path: '/shops?status=open' },
-  { icon: '👤', label: 'My Profile', path: null, action: 'profile' },
-];
 
 const COMMUNITY_POSTS = [
   { id: 1, icon: '🩸', title: 'Blood Donors Needed', sub: 'B+ required at GGH · Urgent', badge: 'Urgent', badgeBg: '#FEE2E2', badgeColor: '#DC2626' },
@@ -46,26 +35,6 @@ const S = {
   sectionHead:  { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 },
   sectionTitle: { fontSize: 16, fontWeight: 800, color: 'var(--text)' },
   seeAll:       { fontSize: 12, color: 'var(--primary)', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 2 },
-  qaGrid: { display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10 },
-  qaItem: {
-    background: 'var(--card)', borderRadius: 14, padding: '14px 6px 12px',
-    textAlign: 'center', boxShadow: 'var(--shadow-sm)',
-    border: '1px solid var(--border)', cursor: 'pointer',
-  },
-  qaIcon:  { fontSize: 24, lineHeight: 1, marginBottom: 6 },
-  qaLabel: { fontSize: 9.5, fontWeight: 600, color: 'var(--text-2)', lineHeight: 1.3 },
-  shopRow: {
-    background: 'var(--card)', borderRadius: 14, padding: '14px',
-    display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10,
-    boxShadow: 'var(--shadow-sm)', border: '1px solid var(--border)', cursor: 'pointer',
-  },
-  shopThumb: {
-    width: 54, height: 54, borderRadius: 13, background: 'var(--green-50)',
-    display: 'flex', alignItems: 'center', justifyContent: 'center',
-    fontSize: 24, flexShrink: 0, overflow: 'hidden',
-  },
-  shopName: { fontSize: 13, fontWeight: 700, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
-  shopMeta: { fontSize: 11, color: 'var(--text-3)', marginTop: 3 },
   badge: (open) => ({
     display: 'inline-flex', alignItems: 'center', gap: 4,
     padding: '2px 9px', borderRadius: 100, fontSize: 10, fontWeight: 700, marginTop: 3,
@@ -74,44 +43,13 @@ const S = {
   }),
 };
 
-const ShopRow = ({ shop }) => {
-  const navigate = useNavigate();
-  const isOpen = shop.currentStatus === 'OPEN';
-  return (
-    <div style={S.shopRow} onClick={() => navigate(`/shops/${shop.id}`)}>
-      <div style={S.shopThumb}>
-        {shop.imageUrl
-          ? <img src={shop.imageUrl} alt={shop.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          : <span>{shop.category?.icon || '🏪'}</span>}
-      </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={S.shopName}>{shop.name}</div>
-        <div style={S.badge(isOpen)}>
-          <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'currentColor', display: 'inline-block' }} />
-          {isOpen ? 'Open' : 'Closed'}
-        </div>
-        <div style={S.shopMeta}>{shop.category?.name}{shop.village ? ` · ${shop.village}` : ''}</div>
-      </div>
-      <div style={{ display: 'flex', gap: 6 }}>
-        {shop.phone && (
-          <button onClick={e => { e.stopPropagation(); window.open(`tel:${shop.phone}`); }}
-            style={{ width: 34, height: 34, borderRadius: '50%', border: 'none', background: 'var(--green-50)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Phone size={15} color="var(--primary)" />
-          </button>
-        )}
-      </div>
-    </div>
-  );
-};
-
 const HomePage = () => {
   const navigate = useNavigate();
   const { user, location } = useAuth();
   const [shops, setShops] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-
-  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     Promise.all([API.get('/public/shops'), API.get('/public/categories')])
@@ -125,18 +63,6 @@ const HomePage = () => {
     if (searchTerm.trim()) navigate(`/discover?q=${encodeURIComponent(searchTerm)}`);
   };
 
-  const handleQuickAction = (a) => {
-    if (a.action === 'emergency') {
-      toast('Call 112 for Police · 108 for Ambulance · 101 for Fire', { icon: '🚨', duration: 5000, style: { fontFamily: 'Inter, sans-serif', fontWeight: 600 } });
-      return;
-    }
-    if (a.action === 'profile') {
-      toast(`Logged in as ${user?.name || 'User'} (${user?.role})`, { icon: '👤', style: { fontFamily: 'Inter, sans-serif' } });
-      return;
-    }
-    navigate(a.path);
-  };
-
   const firstName = user?.name?.split(' ')[0] || 'there';
   const hour = new Date().getHours();
   const greeting = hour < 5 ? 'Good night' : hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
@@ -147,7 +73,6 @@ const HomePage = () => {
     : shops;
   const openShops = nearbyShops.filter(s => s.currentStatus === 'OPEN');
 
-  // Categories that actually have shops in this location
   const localCategories = categories
     .map(cat => ({ ...cat, count: nearbyShops.filter(s => s.category?.id === cat.id).length }))
     .filter(cat => cat.count > 0);
@@ -176,26 +101,11 @@ const HomePage = () => {
             <Search size={16} color="var(--text-3)" />
             <input
               value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
-              placeholder="What are you looking for today?"
+              placeholder="Search businesses, healthcare, services..."
               style={{ flex: 1, border: 'none', outline: 'none', fontSize: 13, color: 'var(--text)', background: 'transparent', fontFamily: 'inherit' }}
             />
           </div>
         </form>
-      </div>
-
-      {/* QUICK ACCESS */}
-      <div style={S.sectionWrap}>
-        <div style={S.sectionHead}>
-          <div style={S.sectionTitle}>Quick Access</div>
-        </div>
-        <div style={S.qaGrid}>
-          {QUICK_ACTIONS.map(a => (
-            <div key={a.label} style={S.qaItem} onClick={() => handleQuickAction(a)}>
-              <div style={S.qaIcon}>{a.icon}</div>
-              <div style={S.qaLabel}>{a.label}</div>
-            </div>
-          ))}
-        </div>
       </div>
 
       {/* EXPLORE LOCATION — category tiles */}
