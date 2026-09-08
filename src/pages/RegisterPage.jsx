@@ -59,7 +59,9 @@ const RegisterPage = () => {
   const [mandalId, setMandalId]     = useState('');
   const [villageId, setVillageId]   = useState('');
   const [villageName, setVillageName] = useState('');
-  const [locLoading, setLocLoading]   = useState(true);
+  const [locLoading, setLocLoading]       = useState(true);
+  const [mandalsLoading, setMandalsLoading] = useState(false);
+  const [villagesLoading, setVillagesLoading] = useState(false);
 
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -76,21 +78,25 @@ const RegisterPage = () => {
   // Fetch mandals when district changes
   useEffect(() => {
     if (!districtId) { setMandals([]); setMandalId(''); setVillages([]); setVillageId(''); return; }
+    setMandalsLoading(true);
+    setMandalId(''); setVillages([]); setVillageId('');
     fetch(`${LOC_API}/districts/${districtId}/mandals`)
       .then(r => r.json())
       .then(d => setMandals(d.data || []))
-      .catch(() => {});
-    setMandalId(''); setVillages([]); setVillageId('');
+      .catch(() => setMandals([]))
+      .finally(() => setMandalsLoading(false));
   }, [districtId]);
 
   // Fetch villages when mandal changes
   useEffect(() => {
     if (!mandalId) { setVillages([]); setVillageId(''); return; }
+    setVillagesLoading(true);
+    setVillageId('');
     fetch(`${LOC_API}/mandals/${mandalId}/villages`)
       .then(r => r.json())
       .then(d => setVillages(d.data || []))
-      .catch(() => {});
-    setVillageId('');
+      .catch(() => setVillages([]))
+      .finally(() => setVillagesLoading(false));
   }, [mandalId]);
 
   const handleChange = (e) => {
@@ -227,7 +233,7 @@ const RegisterPage = () => {
               disabled={!districtId || mandals.length === 0}
               style={{ ...sel, borderColor: mandalId ? '#1E7B3B' : '#E2E8F0', background: mandalId ? 'white' : '#F8FAFC', opacity: !districtId ? 0.55 : 1 }}
               onFocus={focus} onBlur={blur}>
-              <option value="">{!districtId ? 'Select district first' : mandals.length === 0 ? 'Loading mandals...' : 'Select Mandal'}</option>
+              <option value="">{!districtId ? 'Select district first' : mandalsLoading ? 'Loading mandals...' : mandals.length === 0 ? 'No mandals — try another district' : 'Select Mandal'}</option>
               {mandals.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
             </select>
           </div>
@@ -239,7 +245,7 @@ const RegisterPage = () => {
               disabled={!mandalId || villages.length === 0}
               style={{ ...sel, borderColor: villageId ? '#1E7B3B' : '#E2E8F0', background: villageId ? 'white' : '#F8FAFC', opacity: !mandalId ? 0.55 : 1 }}
               onFocus={focus} onBlur={blur}>
-              <option value="">{!mandalId ? 'Select mandal first' : villages.length === 0 ? 'Loading villages...' : 'Select Village / Town'}</option>
+              <option value="">{!mandalId ? 'Select mandal first' : villagesLoading ? 'Loading villages...' : villages.length === 0 ? 'No villages — try another mandal' : 'Select Village / Town'}</option>
               {villages.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
             </select>
             {villageName && (
