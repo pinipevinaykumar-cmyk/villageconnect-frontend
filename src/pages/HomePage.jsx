@@ -138,7 +138,12 @@ const HomePage = () => {
   const firstName = user?.name?.split(' ')[0] || 'there';
   const hour = new Date().getHours();
   const greeting = hour < 5 ? 'Good night' : hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-  const openShops = shops.filter(s => s.currentStatus === 'OPEN');
+
+  const locationName = location?.name?.toLowerCase().trim();
+  const nearbyShops = locationName
+    ? shops.filter(s => (s.village || '').toLowerCase().trim() === locationName)
+    : shops;
+  const openShops = nearbyShops.filter(s => s.currentStatus === 'OPEN');
 
   return (
     <div style={{ background: 'var(--bg)', minHeight: '100vh', paddingBottom: 90 }}>
@@ -189,18 +194,30 @@ const HomePage = () => {
       {/* NEARBY BUSINESSES */}
       <div style={S.sectionWrap}>
         <div style={S.sectionHead}>
-          <div style={S.sectionTitle}>Nearby Businesses</div>
+          <div style={S.sectionTitle}>
+            {location?.name ? `Businesses in ${location.name}` : 'Nearby Businesses'}
+          </div>
           <div style={S.seeAll} onClick={() => navigate('/shops')}>View All <ChevronRight size={13} /></div>
         </div>
         {loading ? (
           <div style={{ textAlign: 'center', padding: '24px 0', color: 'var(--text-3)', fontSize: 13 }}>Loading...</div>
-        ) : shops.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '32px', background: 'var(--card)', borderRadius: 14, border: '1px solid var(--border)' }}>
-            <div style={{ fontSize: 36, marginBottom: 10 }}>🏪</div>
-            <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-2)' }}>No businesses yet</div>
+        ) : nearbyShops.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '32px 20px', background: 'var(--card)', borderRadius: 14, border: '1px dashed var(--border)' }}>
+            <div style={{ fontSize: 40, marginBottom: 10 }}>🌱</div>
+            <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text)', marginBottom: 6 }}>
+              Coming soon to {location?.name || 'your area'}!
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--text-3)', lineHeight: 1.6 }}>
+              No businesses registered here yet.<br />Be the first to list your shop!
+            </div>
+            <button onClick={() => navigate('/register')} style={{
+              marginTop: 14, background: 'var(--primary)', color: 'white', border: 'none',
+              borderRadius: 100, padding: '9px 20px', fontSize: 12, fontWeight: 700,
+              cursor: 'pointer', fontFamily: 'inherit',
+            }}>Register your Business →</button>
           </div>
         ) : (
-          shops.slice(0, 4).map(shop => <ShopRow key={shop.id} shop={shop} />)
+          nearbyShops.slice(0, 4).map(shop => <ShopRow key={shop.id} shop={shop} />)
         )}
       </div>
 
