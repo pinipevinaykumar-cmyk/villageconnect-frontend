@@ -19,6 +19,7 @@ import MerchantDashboard from './pages/merchant/MerchantDashboard';
 import AddShopPage from './pages/merchant/AddShopPage';
 import ManageProductsPage from './pages/merchant/ManageProductsPage';
 import AdminPage from './pages/admin/AdminPage';
+import ProfilePage from './pages/ProfilePage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 const AppContent = () => {
@@ -47,6 +48,7 @@ const AppContent = () => {
         <Route path="/merchant/add-shop" element={<ProtectedRoute requiredRole="MERCHANT"><AddShopPage /></ProtectedRoute>} />
         <Route path="/merchant/shops/:shopId/products" element={<ProtectedRoute requiredRole="MERCHANT"><ManageProductsPage /></ProtectedRoute>} />
         <Route path="/admin" element={<ProtectedRoute requiredRole="ADMIN"><AdminPage /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
       </Routes>
       {!isPublic && <BottomNav />}
     </div>

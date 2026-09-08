@@ -43,12 +43,7 @@ const DiscoverPage = () => {
     finally { setLoading(false); }
   };
 
-  const displayed = searchTerm
-    ? shops.filter(s =>
-        s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (s.category?.name || '').toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    : shops;
+  const displayed = shops;
 
   return (
     <div style={{ background: 'var(--bg)', minHeight: '100vh', paddingBottom: 90 }}>

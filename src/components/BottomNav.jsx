@@ -1,13 +1,12 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import toast from 'react-hot-toast';
 
 const tabs = [
   { label: 'Home',      emoji: '🏠', path: '/home' },
   { label: 'Discover',  emoji: '🔍', path: '/discover' },
   { label: 'Community', emoji: '📢', path: '/community' },
   { label: 'Services',  emoji: '🛠', path: '/services' },
-  { label: 'Profile',   emoji: '👤', path: null },
+  { label: 'Profile',   emoji: '👤', path: '/profile' },
 ];
 
 const BottomNav = () => {
@@ -15,10 +14,6 @@ const BottomNav = () => {
   const { pathname } = useLocation();
 
   const handleTab = (tab) => {
-    if (!tab.path) {
-      toast('Profile coming soon! 🚀', { icon: '✨', style: { fontFamily: 'Inter, sans-serif', fontWeight: 600 } });
-      return;
-    }
     navigate(tab.path);
   };
 
