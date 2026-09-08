@@ -6,17 +6,32 @@ import API from '../../api/axios';
 const CLOUDINARY_CLOUD_NAME = process.env.REACT_APP_CLOUDINARY_CLOUD_NAME || 'villageconnect';
 const CLOUDINARY_UPLOAD_PRESET = process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET || 'villageconnect_shops';
 
-// Category type → form label overrides
+// Each entry: name = business name label, owner = owner field label, desc = description hint, nameEx = placeholder
 const CATEGORY_LABELS = {
-  medical:    { name: 'Clinic / Hospital Name', desc: 'Services offered (e.g. General medicine, Paediatrics)', nameEx: 'e.g. Sri Sai Clinic, City Hospital' },
-  hospital:   { name: 'Hospital Name',          desc: 'Departments & specialities',                           nameEx: 'e.g. Govt. General Hospital' },
-  clinic:     { name: 'Clinic Name',            desc: 'Services offered',                                     nameEx: 'e.g. Dr. Rao Eye Clinic' },
-  pharmacy:   { name: 'Pharmacy Name',          desc: 'Medicines & services available',                        nameEx: 'e.g. Apollo Pharmacy, Medplus' },
-  doctor:     { name: 'Doctor / Practice Name', desc: 'Specialisation & services',                            nameEx: 'e.g. Dr. K. Rao — Cardiologist' },
-  hotel:      { name: 'Hotel / Restaurant Name',desc: 'Cuisine & specialities',                               nameEx: 'e.g. Srinivasa Mess, Hotel Annapoorna' },
-  salon:      { name: 'Salon / Parlour Name',   desc: 'Services offered',                                     nameEx: 'e.g. Style Hub, Lakshmi Beauty Parlour' },
-  hardware:   { name: 'Store Name',             desc: 'Products available',                                   nameEx: 'e.g. Ravi Hardware & Electricals' },
-  default:    { name: 'Business Name',          desc: 'What products or services do you offer?',              nameEx: 'e.g. Sri Lakshmi Stores' },
+  // Healthcare
+  medical:    { name: 'Clinic / Hospital Name',  owner: 'Doctor / Owner Name',  desc: 'Services (e.g. General medicine, Paediatrics)',       nameEx: 'e.g. Sri Sai Clinic, City Hospital' },
+  hospital:   { name: 'Hospital Name',           owner: 'Doctor / Admin Name',  desc: 'Departments & specialities',                          nameEx: 'e.g. Govt. General Hospital' },
+  clinic:     { name: 'Clinic Name',             owner: 'Doctor Name',          desc: 'Services offered',                                    nameEx: 'e.g. Dr. Rao Eye Clinic' },
+  pharmacy:   { name: 'Pharmacy / Medical Shop', owner: 'Owner Name',           desc: 'Medicines & services available',                      nameEx: 'e.g. Apollo Pharmacy, Medplus' },
+  doctor:     { name: 'Doctor / Practice Name',  owner: 'Doctor Name',          desc: 'Specialisation & services',                           nameEx: 'e.g. Dr. K. Rao — Cardiologist' },
+  // Food & Drink
+  hotel:      { name: 'Hotel / Restaurant Name', owner: 'Owner Name',           desc: 'Cuisine & specialities (e.g. Andhra meals, Biryani)', nameEx: 'e.g. Srinivasa Mess, Hotel Annapoorna' },
+  bakery:     { name: 'Bakery Name',             owner: 'Owner Name',           desc: 'Products (e.g. Breads, Cakes, Sweets, Biscuits)',     nameEx: 'e.g. Sri Krishna Bakery, Hari Sweets' },
+  milk:       { name: 'Dairy / Milk Centre',     owner: 'Owner Name',           desc: 'Products (e.g. Milk, Curd, Paneer, Buttermilk)',     nameEx: 'e.g. Amul Dairy, Nandini Milk Centre' },
+  // Grocery & Fresh
+  grocery:    { name: 'Shop Name',               owner: 'Owner Name',           desc: 'Products (e.g. Rice, Pulses, Provisions, Oils)',      nameEx: 'e.g. Sri Lakshmi Kirana Store' },
+  vegetable:  { name: 'Shop / Stall Name',       owner: 'Owner Name',           desc: 'Vegetables & fruits available',                       nameEx: 'e.g. Sai Vegetables, Fresh Greens' },
+  chicken:    { name: 'Shop Name',               owner: 'Owner Name',           desc: 'Products (e.g. Chicken, Mutton, Fish, Eggs)',         nameEx: 'e.g. Srinivasa Chicken Centre' },
+  meat:       { name: 'Shop Name',               owner: 'Owner Name',           desc: 'Products available',                                  nameEx: 'e.g. Srinivasa Non-Veg Centre' },
+  // Retail
+  hardware:   { name: 'Hardware Store Name',     owner: 'Owner Name',           desc: 'Products (e.g. Paints, Pipes, Tools, Sanitary)',      nameEx: 'e.g. Ravi Hardware & Electricals' },
+  clothing:   { name: 'Store Name',              owner: 'Owner Name',           desc: 'Clothes & brands available',                          nameEx: 'e.g. Sri Rama Garments, Fashion Hub' },
+  electronic: { name: 'Electronics Store Name',  owner: 'Owner Name',           desc: 'Products & brands (e.g. TVs, Phones, ACs, Fans)',     nameEx: 'e.g. Sai Electronics, Sony Centre' },
+  petrol:     { name: 'Petrol Bunk Name',        owner: 'Owner Name',           desc: 'Fuels & services available',                          nameEx: 'e.g. HP Petrol Bunk, Indian Oil' },
+  // Beauty
+  salon:      { name: 'Salon / Parlour Name',    owner: 'Owner / Stylist Name', desc: 'Services (e.g. Haircut, Facial, Bridal, Threading)',  nameEx: 'e.g. Style Hub, Lakshmi Beauty Parlour' },
+  // Default
+  default:    { name: 'Business Name',           owner: 'Owner Name',           desc: 'What products or services do you offer?',             nameEx: 'e.g. Sri Lakshmi Stores' },
 };
 
 const AP_VILLAGES = [
@@ -200,7 +215,7 @@ const AddShopPage = () => {
           </div>
 
           <div style={{ marginBottom: 14 }}>
-            <label style={lbl}>Owner / Doctor Name</label>
+            <label style={lbl}>{labels.owner}</label>
             <input type="text" name="ownerName" value={form.ownerName} onChange={handleChange}
               placeholder="Your full name" style={inp} />
           </div>
