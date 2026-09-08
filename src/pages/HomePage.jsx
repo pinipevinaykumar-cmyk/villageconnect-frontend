@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, ChevronRight, Bell } from 'lucide-react';
+import { ChevronRight, Bell } from 'lucide-react';
 import toast from 'react-hot-toast';
 import API from '../api/axios';
 import { useAuth } from '../context/AuthContext';
@@ -26,11 +26,6 @@ const S = {
     padding: '5px 14px', marginTop: 10, fontSize: 12, fontWeight: 600,
     backdropFilter: 'blur(8px)', cursor: 'pointer',
   },
-  searchBox: {
-    background: 'white', borderRadius: 14, padding: '13px 16px',
-    display: 'flex', alignItems: 'center', gap: 10, marginTop: 16,
-    boxShadow: '0 8px 24px rgba(0,0,0,.18)',
-  },
   sectionWrap:  { padding: '20px 16px 0' },
   sectionHead:  { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 },
   sectionTitle: { fontSize: 16, fontWeight: 800, color: 'var(--text)' },
@@ -49,19 +44,12 @@ const HomePage = () => {
   const [shops, setShops] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-
   useEffect(() => {
     Promise.all([API.get('/public/shops'), API.get('/public/categories')])
       .then(([s, c]) => { setShops(s.data.data || []); setCategories(c.data.data || []); })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
-
-  const handleSearch = e => {
-    e.preventDefault();
-    if (searchTerm.trim()) navigate(`/discover?q=${encodeURIComponent(searchTerm)}`);
-  };
 
   const firstName = user?.name?.split(' ')[0] || 'there';
   const hour = new Date().getHours();
@@ -96,16 +84,6 @@ const HomePage = () => {
             <Bell size={18} color="white" />
           </button>
         </div>
-        <form onSubmit={handleSearch}>
-          <div style={S.searchBox}>
-            <Search size={16} color="var(--text-3)" />
-            <input
-              value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
-              placeholder="Search businesses, healthcare, services..."
-              style={{ flex: 1, border: 'none', outline: 'none', fontSize: 13, color: 'var(--text)', background: 'transparent', fontFamily: 'inherit' }}
-            />
-          </div>
-        </form>
       </div>
 
       {/* EXPLORE LOCATION — category tiles */}
