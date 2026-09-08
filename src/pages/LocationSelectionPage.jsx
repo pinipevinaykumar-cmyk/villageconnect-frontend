@@ -4,14 +4,24 @@ import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 
 const CITIES = [
-  { name: 'Chennai',   state: 'Tamil Nadu',   emoji: '🌊' },
-  { name: 'Hyderabad', state: 'Telangana',    emoji: '🏰' },
-  { name: 'Bangalore', state: 'Karnataka',    emoji: '🌿' },
-  { name: 'Mumbai',    state: 'Maharashtra',  emoji: '🌆' },
-  { name: 'Delhi',     state: 'Delhi',        emoji: '🕌' },
-  { name: 'Kolkata',   state: 'West Bengal',  emoji: '🌉' },
-  { name: 'Pune',      state: 'Maharashtra',  emoji: '🎓' },
-  { name: 'Ahmedabad', state: 'Gujarat',      emoji: '🦁' },
+  { name: 'Hyderabad',      state: 'Telangana',        emoji: '🏰' },
+  { name: 'Visakhapatnam',  state: 'Andhra Pradesh',   emoji: '⛵' },
+  { name: 'Vijayawada',     state: 'Andhra Pradesh',   emoji: '🌊' },
+  { name: 'Guntur',         state: 'Andhra Pradesh',   emoji: '🌶️' },
+  { name: 'Tirupati',       state: 'Andhra Pradesh',   emoji: '🛕' },
+  { name: 'Nellore',        state: 'Andhra Pradesh',   emoji: '🏞️' },
+  { name: 'Kurnool',        state: 'Andhra Pradesh',   emoji: '🌾' },
+  { name: 'Rajahmundry',    state: 'Andhra Pradesh',   emoji: '🌉' },
+  { name: 'Warangal',       state: 'Telangana',        emoji: '🏯' },
+  { name: 'Chennai',        state: 'Tamil Nadu',       emoji: '🌊' },
+  { name: 'Bangalore',      state: 'Karnataka',        emoji: '🌿' },
+  { name: 'Mumbai',         state: 'Maharashtra',      emoji: '🌆' },
+  { name: 'Delhi',          state: 'Delhi',            emoji: '🕌' },
+  { name: 'Kolkata',        state: 'West Bengal',      emoji: '🌉' },
+  { name: 'Pune',           state: 'Maharashtra',      emoji: '🎓' },
+  { name: 'Ahmedabad',      state: 'Gujarat',          emoji: '🦁' },
+  { name: 'Jaipur',         state: 'Rajasthan',        emoji: '🏰' },
+  { name: 'Coimbatore',     state: 'Tamil Nadu',       emoji: '🏭' },
 ];
 
 const LocationSelectionPage = () => {
@@ -130,16 +140,25 @@ const LocationSelectionPage = () => {
                   <div style={{ fontSize: 14, fontWeight: 700, color: 'white' }}>{city.name}</div>
                   <div style={{ fontSize: 12, color: 'rgba(255,255,255,.5)', marginTop: 2 }}>{city.state}</div>
                 </div>
-                {isSelected && (
-                  <span style={{ fontSize: 18, color: '#4ADE80' }}>✓</span>
-                )}
+                {isSelected && <span style={{ fontSize: 18, color: '#4ADE80' }}>✓</span>}
               </button>
             );
           })}
-          {filtered.length === 0 && (
-            <div style={{ textAlign: 'center', padding: '32px', color: 'rgba(255,255,255,.4)', fontSize: 13 }}>
-              No cities match your search
-            </div>
+          {filtered.length === 0 && search.trim().length > 1 && (
+            <button onClick={() => handleSelect({ name: search.trim(), state: 'India', emoji: '📍' })}
+              style={{
+                width: '100%', display: 'flex', alignItems: 'center', gap: 14,
+                background: 'rgba(30,123,59,.2)', border: '1.5px solid rgba(74,222,128,.3)',
+                borderRadius: 14, padding: '14px 16px',
+                cursor: 'pointer', fontFamily: 'inherit',
+              }}>
+              <span style={{ fontSize: 26 }}>📍</span>
+              <div style={{ flex: 1, textAlign: 'left' }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: 'white' }}>Use "{search.trim()}"</div>
+                <div style={{ fontSize: 12, color: 'rgba(255,255,255,.5)', marginTop: 2 }}>Set as my location</div>
+              </div>
+              <span style={{ fontSize: 12, color: '#4ADE80', fontWeight: 700 }}>Select →</span>
+            </button>
           )}
         </div>
       </div>
