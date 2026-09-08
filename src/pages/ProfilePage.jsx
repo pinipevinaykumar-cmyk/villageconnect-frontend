@@ -13,7 +13,6 @@ const ProfilePage = () => {
   const { user, logout, location } = useAuth();
 
   const meta = ROLE_META[user?.role] || ROLE_META.CUSTOMER;
-  const firstName = user?.name?.split(' ')[0] || 'User';
   const initials = (user?.name || 'U').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
 
   const handleLogout = () => {
