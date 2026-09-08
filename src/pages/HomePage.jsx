@@ -1,78 +1,117 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, MapPin, Phone, ChevronRight } from 'lucide-react';
+import { Search, ChevronRight, Phone } from 'lucide-react';
 import API from '../api/axios';
+import { useAuth } from '../context/AuthContext';
 
-
-const CATEGORIES = [
-  { name: 'Grocery',    icon: '🛒' },
-  { name: 'Vegetables', icon: '🥦' },
-  { name: 'Dairy',      icon: '🥛' },
-  { name: 'Medicine',   icon: '💊' },
-  { name: 'More',       icon: '⋯'  },
+const QUICK_ACTIONS = [
+  { icon: '🏥', label: 'Healthcare', path: '/shops?categoryId=4' },
+  { icon: '🏫', label: 'Education',  path: '/shops' },
+  { icon: '🏪', label: 'Businesses', path: '/shops' },
+  { icon: '⚽', label: 'Sports',     path: '/shops' },
+  { icon: '📅', label: 'Events',     path: '/shops' },
+  { icon: '🛠', label: 'Services',   path: '/shops' },
+  { icon: '📢', label: 'Community',  path: '/shops' },
+  { icon: '🚨', label: 'Emergency',  path: '/shops' },
 ];
+
+const S = {
+  hero: {
+    background: 'linear-gradient(160deg, #1E7B3B 0%, #2F855A 100%)',
+    padding: '52px 18px 24px',
+    color: 'white',
+  },
+  greeting:   { fontSize: 13, color: 'rgba(255,255,255,.75)', fontWeight: 500 },
+  name:       { fontSize: 24, fontWeight: 900, marginTop: 2, letterSpacing: '-.5px' },
+  locationPill: {
+    display: 'inline-flex', alignItems: 'center', gap: 5,
+    background: 'rgba(255,255,255,.18)', borderRadius: 100,
+    padding: '5px 14px', marginTop: 10, fontSize: 12, fontWeight: 600,
+    backdropFilter: 'blur(8px)', cursor: 'pointer',
+  },
+  searchBox: {
+    background: 'white', borderRadius: 14, padding: '13px 16px',
+    display: 'flex', alignItems: 'center', gap: 10, marginTop: 16,
+    boxShadow: '0 8px 24px rgba(0,0,0,.18)',
+  },
+  searchText: { fontSize: 13, color: 'var(--text-3)', flex: 1 },
+
+  emergencyBanner: {
+    margin: '16px 16px 0',
+    background: 'linear-gradient(135deg, #EF4444, #DC2626)',
+    borderRadius: 14, padding: '14px 16px',
+    display: 'flex', alignItems: 'center', gap: 12,
+    boxShadow: '0 6px 20px rgba(239,68,68,.3)',
+  },
+
+  sectionWrap:  { padding: '20px 16px 0' },
+  sectionHead:  { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 },
+  sectionTitle: { fontSize: 16, fontWeight: 800, color: 'var(--text)' },
+  seeAll:       { fontSize: 12, color: 'var(--primary)', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 2 },
+
+  qaGrid: { display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10 },
+  qaItem: {
+    background: 'var(--card)', borderRadius: 14, padding: '14px 6px 12px',
+    textAlign: 'center', boxShadow: 'var(--shadow-sm)',
+    border: '1px solid var(--border)', cursor: 'pointer',
+  },
+  qaIcon:  { fontSize: 24, lineHeight: 1, marginBottom: 6 },
+  qaLabel: { fontSize: 9.5, fontWeight: 600, color: 'var(--text-2)', lineHeight: 1.3 },
+
+  shopRow: {
+    background: 'var(--card)', borderRadius: 14, padding: '14px',
+    display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10,
+    boxShadow: 'var(--shadow-sm)', border: '1px solid var(--border)', cursor: 'pointer',
+  },
+  shopThumb: {
+    width: 54, height: 54, borderRadius: 13, background: 'var(--green-50)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    fontSize: 24, flexShrink: 0, overflow: 'hidden',
+  },
+  shopName: { fontSize: 13, fontWeight: 700, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
+  shopMeta: { fontSize: 11, color: 'var(--text-3)', marginTop: 3 },
+
+  badge: (open) => ({
+    display: 'inline-flex', alignItems: 'center', gap: 4,
+    padding: '2px 9px', borderRadius: 100, fontSize: 10, fontWeight: 700, marginTop: 3,
+    background: open ? 'var(--green-100)' : 'var(--red-light)',
+    color: open ? '#15803D' : 'var(--red)',
+  }),
+
+  eventCard: {
+    background: 'var(--card)', borderRadius: 14, overflow: 'hidden',
+    boxShadow: 'var(--shadow-sm)', border: '1px solid var(--border)',
+    width: 180, flexShrink: 0,
+  },
+  eventImg: {
+    height: 92, background: 'linear-gradient(135deg, var(--primary), var(--accent))',
+    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 34,
+  },
+};
 
 const ShopRow = ({ shop }) => {
   const navigate = useNavigate();
   const isOpen = shop.currentStatus === 'OPEN';
-
-  const handleCall = (e) => { e.stopPropagation(); if (shop.phone) window.open(`tel:${shop.phone}`); };
-  const handleWA   = (e) => { e.stopPropagation(); if (shop.phone) window.open(`https://wa.me/${shop.phone}`); };
-
   return (
-    <div onClick={() => navigate(`/shops/${shop.id}`)}
-      style={{
-        display: 'flex', alignItems: 'center', gap: 12,
-        padding: '12px 16px', background: 'white',
-        borderBottom: '1px solid #F3F4F6', cursor: 'pointer',
-      }}>
-
-      {/* Thumbnail */}
-      <div style={{
-        width: 62, height: 62, borderRadius: 10, overflow: 'hidden', flexShrink: 0,
-        background: '#E8F5E9', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 26,
-      }}>
+    <div style={S.shopRow} onClick={() => navigate(`/shops/${shop.id}`)}>
+      <div style={S.shopThumb}>
         {shop.imageUrl
           ? <img src={shop.imageUrl} alt={shop.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          : <span>{shop.category?.icon || '🏪'}</span>
-        }
+          : <span>{shop.category?.icon || '🏪'}</span>}
       </div>
-
-      {/* Info */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 14, fontWeight: 700, color: '#111827', marginBottom: 3 }}>
-          {shop.name}
-        </div>
-        <span style={{
-          fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 20,
-          background: isOpen ? '#E8F5E9' : '#FEE2E2',
-          color: isOpen ? '#15803D' : '#DC2626',
-          display: 'inline-block', marginBottom: 2,
-        }}>
+        <div style={S.shopName}>{shop.name}</div>
+        <div style={S.badge(isOpen)}>
+          <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'currentColor', display: 'inline-block' }} />
           {isOpen ? 'Open' : 'Closed'}
-        </span>
-        <div style={{ fontSize: 11, color: '#6B7280' }}>
-          {isOpen
-            ? shop.closeTime ? `Closes ${shop.closeTime}` : ''
-            : shop.openTime  ? `Opens ${shop.openTime}`  : ''}
         </div>
+        <div style={S.shopMeta}>{shop.category?.name}{shop.village ? ` · ${shop.village}` : ''}</div>
       </div>
-
-      {/* Actions */}
-      <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-        <button onClick={handleCall} style={{
-          background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: '#2E7D32',
-        }}>
-          <Phone size={18} />
-        </button>
-        {isOpen && (
-          <button onClick={handleWA} style={{
-            background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: '#25D366',
-          }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-            </svg>
+      <div style={{ display: 'flex', gap: 6 }}>
+        {shop.phone && (
+          <button onClick={e => { e.stopPropagation(); window.open(`tel:${shop.phone}`); }}
+            style={{ width: 34, height: 34, borderRadius: '50%', border: 'none', background: 'var(--green-50)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Phone size={15} color="var(--primary)" />
           </button>
         )}
       </div>
@@ -82,116 +121,142 @@ const ShopRow = ({ shop }) => {
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const [shops, setShops]           = useState([]);
+  const { user } = useAuth();
+  const [shops, setShops]         = useState([]);
   const [categories, setCategories] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading]       = useState(true);
+  const [loading, setLoading]     = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [shopsRes, catsRes] = await Promise.all([
-          API.get('/public/shops'),
-          API.get('/public/categories'),
-        ]);
-        setShops(shopsRes.data.data || []);
-        setCategories(catsRes.data.data || []);
-      } catch (err) { console.error(err); }
-      finally { setLoading(false); }
-    };
-    fetchData();
+    Promise.all([API.get('/public/shops'), API.get('/public/categories')])
+      .then(([s, c]) => { setShops(s.data.data || []); setCategories(c.data.data || []); })
+      .catch(console.error)
+      .finally(() => setLoading(false));
   }, []);
 
-  const handleSearch = (e) => {
+  const handleSearch = e => {
     e.preventDefault();
     navigate(`/shops?q=${searchTerm}`);
   };
 
-  const nearbyShops = shops.slice(0, 4);
+  const firstName = user?.name?.split(' ')[0] || 'there';
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
 
   return (
-    <div style={{ background: '#F3F4F6', minHeight: '100vh', paddingBottom: 80 }}>
+    <div style={{ background: 'var(--bg)', minHeight: '100vh', paddingBottom: 90 }}>
 
-      {/* Search + Location bar */}
-      <div style={{ background: 'white', padding: '14px 16px 12px', boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
+      {/* ── HERO ── */}
+      <div style={S.hero}>
+        <div style={S.greeting}>{greeting} 👋</div>
+        <div style={S.name}>{firstName}</div>
+        <div style={S.locationPill}>📍 All India</div>
         <form onSubmit={handleSearch}>
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 10,
-            background: '#F3F4F6', borderRadius: 50, padding: '11px 16px',
-          }}>
-            <Search size={16} color="#9CA3AF" />
+          <div style={S.searchBox}>
+            <Search size={16} color="var(--text-3)" />
             <input
               value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
-              placeholder="Search for shops, products..."
-              style={{
-                flex: 1, background: 'none', border: 'none', outline: 'none',
-                fontSize: 14, color: '#374151', fontFamily: 'inherit',
-              }}
+              placeholder="What are you looking for today?"
+              style={{ flex: 1, border: 'none', outline: 'none', fontSize: 13, color: 'var(--text)', background: 'transparent', fontFamily: 'inherit' }}
             />
+            <span style={{ fontSize: 18, cursor: 'pointer' }}>🎙</span>
           </div>
         </form>
-
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 12 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <MapPin size={15} color="#2E7D32" fill="#E8F5E9" />
-            <span style={{ fontSize: 14, color: '#374151', fontWeight: 600 }}>All India</span>
-          </div>
-        </div>
       </div>
 
-      {/* Nearby Shops */}
-      <div style={{ marginTop: 14, padding: '0 12px' }}>
-        <div style={{
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          marginBottom: 10,
-        }}>
-          <span style={{ fontSize: 17, fontWeight: 800, color: '#111827' }}>Shops in India</span>
-          <button onClick={() => navigate('/shops')}
-            style={{
-              background: 'none', border: 'none', cursor: 'pointer', color: '#2E7D32',
-              fontSize: 13, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 2,
-              fontFamily: 'inherit',
-            }}>
-            View All <ChevronRight size={14} />
-          </button>
+      {/* ── EMERGENCY BANNER ── */}
+      <div style={S.emergencyBanner}>
+        <span style={{ fontSize: 24 }}>🩸</span>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 13, fontWeight: 800, color: 'white' }}>Urgent: Blood Donors Needed</div>
+          <div style={{ fontSize: 11, color: 'rgba(255,255,255,.8)', marginTop: 2 }}>B+ required at GGH · Call 108</div>
         </div>
-
-        <div style={{ background: 'white', borderRadius: 18, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.07)' }}>
-          {loading ? (
-            <div style={{ padding: 36, textAlign: 'center', color: '#9CA3AF', fontSize: 14 }}>Loading shops...</div>
-          ) : nearbyShops.length === 0 ? (
-            <div style={{ padding: 36, textAlign: 'center', color: '#9CA3AF', fontSize: 14 }}>No shops found nearby</div>
-          ) : (
-            nearbyShops.map(shop => <ShopRow key={shop.id} shop={shop} />)
-          )}
-        </div>
+        <button style={{ background: 'white', color: '#DC2626', borderRadius: 100, padding: '6px 14px', fontSize: 11, fontWeight: 700, border: 'none', cursor: 'pointer' }}>
+          Help Now
+        </button>
       </div>
 
-      {/* Popular Categories */}
-      <div style={{ marginTop: 20, padding: '0 12px' }}>
-        <span style={{ fontSize: 17, fontWeight: 800, color: '#111827', display: 'block', marginBottom: 12 }}>
-          Popular Categories
-        </span>
-        <div style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 6,
-          scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-          {(categories.length > 0
-            ? categories.map(c => ({ name: c.name, icon: c.icon || '🏪', id: c.id }))
-            : CATEGORIES
-          ).map((cat) => (
-            <button key={cat.name}
-              onClick={() => navigate(`/shops${cat.id ? `?categoryId=${cat.id}` : ''}`)}
-              style={{
-                flexShrink: 0, width: 76, background: 'white', borderRadius: 16,
-                border: 'none', padding: '14px 8px 12px', cursor: 'pointer',
-                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
-                boxShadow: '0 2px 8px rgba(0,0,0,0.07)', fontFamily: 'inherit',
-              }}>
-              <span style={{ fontSize: 26 }}>{cat.icon}</span>
-              <span style={{ fontSize: 11, fontWeight: 600, color: '#374151', textAlign: 'center' }}>{cat.name}</span>
-            </button>
+      {/* ── QUICK ACTIONS ── */}
+      <div style={S.sectionWrap}>
+        <div style={S.sectionHead}>
+          <div style={S.sectionTitle}>Quick Access</div>
+        </div>
+        <div style={S.qaGrid}>
+          {QUICK_ACTIONS.map(a => (
+            <div key={a.label} style={S.qaItem} onClick={() => navigate(a.path)}>
+              <div style={S.qaIcon}>{a.icon}</div>
+              <div style={S.qaLabel}>{a.label}</div>
+            </div>
           ))}
         </div>
       </div>
+
+      {/* ── SHOPS ── */}
+      <div style={S.sectionWrap}>
+        <div style={S.sectionHead}>
+          <div style={S.sectionTitle}>Shops in India</div>
+          <div style={S.seeAll} onClick={() => navigate('/shops')}>View All <ChevronRight size={13} /></div>
+        </div>
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '24px 0', color: 'var(--text-3)', fontSize: 13 }}>Loading shops...</div>
+        ) : shops.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '32px', background: 'var(--card)', borderRadius: 14, border: '1px solid var(--border)' }}>
+            <div style={{ fontSize: 36, marginBottom: 10 }}>🏪</div>
+            <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-2)' }}>No shops yet</div>
+            <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 4 }}>Be the first to add a shop</div>
+          </div>
+        ) : (
+          shops.slice(0, 4).map(shop => <ShopRow key={shop.id} shop={shop} />)
+        )}
+      </div>
+
+      {/* ── CATEGORIES ── */}
+      {categories.length > 0 && (
+        <div style={S.sectionWrap}>
+          <div style={S.sectionHead}>
+            <div style={S.sectionTitle}>Popular Categories</div>
+            <div style={S.seeAll} onClick={() => navigate('/shops')}>View All <ChevronRight size={13} /></div>
+          </div>
+          <div style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 8 }} className="scroll-hide">
+            {categories.map(cat => (
+              <button key={cat.id}
+                onClick={() => navigate(`/shops?categoryId=${cat.id}`)}
+                style={{
+                  flexShrink: 0, width: 80, background: 'var(--card)', borderRadius: 14,
+                  border: '1px solid var(--border)', padding: '14px 6px 12px',
+                  cursor: 'pointer', textAlign: 'center', boxShadow: 'var(--shadow-sm)',
+                  fontFamily: 'inherit',
+                }}>
+                <div style={{ fontSize: 26, marginBottom: 6 }}>{cat.icon || '🏪'}</div>
+                <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-2)', lineHeight: 1.3 }}>{cat.name}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── TODAY'S EVENTS ── */}
+      <div style={S.sectionWrap}>
+        <div style={S.sectionHead}>
+          <div style={S.sectionTitle}>Today in Your Area</div>
+        </div>
+        <div style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 8 }} className="scroll-hide">
+          {[
+            { emoji: '🏏', title: 'Cricket Tournament', time: 'Ground 1 · 6 AM' },
+            { emoji: '🎭', title: 'Cultural Program',   time: 'Town Hall · 7 PM' },
+            { emoji: '🩺', title: 'Free Health Camp',   time: 'PHC Centre · 9 AM' },
+          ].map(ev => (
+            <div key={ev.title} style={S.eventCard}>
+              <div style={S.eventImg}>{ev.emoji}</div>
+              <div style={{ padding: '10px 12px' }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)' }}>{ev.title}</div>
+                <div style={{ fontSize: 10, color: 'var(--text-3)', marginTop: 4 }}>Today · {ev.time}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
     </div>
   );
 };

@@ -1,46 +1,61 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, Store, ShoppingBag, User } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const tabs = [
-  { label: 'Home',   icon: Home,        path: '/home' },
-  { label: 'Shops',  icon: Store,       path: '/shops' },
-  { label: 'Orders', icon: ShoppingBag, path: '/orders' },
-  { label: 'Profile',icon: User,        path: '/profile' },
+  { label: 'Home',      emoji: '🏠', path: '/home' },
+  { label: 'Discover',  emoji: '🔍', path: '/shops' },
+  { label: 'Community', emoji: '💬', path: null },
+  { label: 'Services',  emoji: '🛠', path: null },
+  { label: 'Profile',   emoji: '👤', path: null },
 ];
 
 const BottomNav = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
+  const handleTab = (tab) => {
+    if (!tab.path) {
+      toast('Coming soon! 🚀', { icon: '✨', style: { fontFamily: 'Inter, sans-serif', fontWeight: 600 } });
+      return;
+    }
+    navigate(tab.path);
+  };
+
   return (
     <div style={{
-      position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50,
-      background: 'white',
-      borderTop: '1px solid #E5E7EB',
+      position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100,
+      background: 'rgba(255,255,255,.95)',
+      backdropFilter: 'blur(20px)',
+      borderTop: '1px solid var(--border)',
       display: 'flex',
-      boxShadow: '0 -2px 10px rgba(0,0,0,0.08)',
+      boxShadow: '0 -4px 20px rgba(0,0,0,.08)',
+      paddingBottom: 'env(safe-area-inset-bottom)',
     }}>
-      {tabs.map(({ label, icon: Icon, path }) => {
-        const active = pathname === path || (path === '/shops' && pathname.startsWith('/shops'));
+      {tabs.map(tab => {
+        const active = tab.path && (pathname === tab.path || (tab.path === '/shops' && pathname.startsWith('/shops')));
         return (
-          <button key={label} onClick={() => navigate(path)}
+          <button key={tab.label} onClick={() => handleTab(tab)}
             style={{
               flex: 1, padding: '10px 0 8px',
               background: 'none', border: 'none', cursor: 'pointer',
               display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
-              color: active ? '#2E7D32' : '#9CA3AF',
-              fontFamily: 'inherit',
-              position: 'relative',
+              fontFamily: 'inherit', position: 'relative',
             }}>
             {active && (
-              <div style={{
-                position: 'absolute', top: 0, left: '25%', right: '25%',
-                height: 2, background: '#2E7D32', borderRadius: '0 0 2px 2px',
+              <span style={{
+                position: 'absolute', top: 0, left: '30%', right: '30%',
+                height: 3, background: 'var(--primary)', borderRadius: '0 0 3px 3px',
               }} />
             )}
-            <Icon size={20} strokeWidth={active ? 2.5 : 1.8} />
-            <span style={{ fontSize: 10, fontWeight: active ? 700 : 400 }}>{label}</span>
+            <span style={{ fontSize: 21, lineHeight: 1 }}>{tab.emoji}</span>
+            <span style={{
+              fontSize: 9.5, fontWeight: active ? 700 : 500,
+              color: active ? 'var(--primary)' : 'var(--text-3)',
+              letterSpacing: '.01em',
+            }}>
+              {tab.label}
+            </span>
           </button>
         );
       })}

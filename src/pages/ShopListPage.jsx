@@ -1,44 +1,43 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Search, ArrowLeft } from 'lucide-react';
+import { Search, ArrowLeft, SlidersHorizontal } from 'lucide-react';
 import API from '../api/axios';
-import ShopCard from '../components/ShopCard';
-import CategoryCard from '../components/CategoryCard';
 import LoadingSpinner from '../components/LoadingSpinner';
+import ShopCard from '../components/ShopCard';
 
 const ShopListPage = () => {
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const village = searchParams.get('village') || '';
-  const [shops, setShops] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(true);
+  const navigate       = useNavigate();
+  const village        = searchParams.get('village') || '';
+  const initCategory   = searchParams.get('categoryId') ? Number(searchParams.get('categoryId')) : null;
 
-  const fetchCategories = useCallback(async () => {
-    try {
-      const res = await API.get('/public/categories');
-      setCategories(res.data.data);
-    } catch (err) { console.error(err); }
+  const [shops,          setShops]          = useState([]);
+  const [categories,     setCategories]     = useState([]);
+  const [selectedCat,    setSelectedCat]    = useState(initCategory);
+  const [searchTerm,     setSearchTerm]     = useState(searchParams.get('q') || '');
+  const [loading,        setLoading]        = useState(true);
+  const [filterOpen,     setFilterOpen]     = useState(false);
+  const [filterStatus,   setFilterStatus]   = useState('all');
+
+  useEffect(() => {
+    API.get('/public/categories').then(r => setCategories(r.data.data || [])).catch(console.error);
   }, []);
 
   const fetchShops = useCallback(async () => {
     setLoading(true);
     try {
       const params = {};
-      if (village) params.village = village;
-      if (selectedCategory) params.categoryId = selectedCategory;
+      if (village)     params.village    = village;
+      if (selectedCat) params.categoryId = selectedCat;
       const res = await API.get('/public/shops', { params });
-      setShops(res.data.data);
-    } catch (err) { console.error(err); }
+      setShops(res.data.data || []);
+    } catch (e) { console.error(e); }
     finally { setLoading(false); }
-  }, [village, selectedCategory]);
+  }, [village, selectedCat]);
 
-  useEffect(() => { fetchCategories(); }, [fetchCategories]);
   useEffect(() => { fetchShops(); }, [fetchShops]);
 
-  const handleSearch = async (e) => {
+  const handleSearch = async e => {
     e.preventDefault();
     if (!searchTerm.trim()) { fetchShops(); return; }
     setLoading(true);
@@ -46,63 +45,127 @@ const ShopListPage = () => {
       const params = { keyword: searchTerm };
       if (village) params.village = village;
       const res = await API.get('/public/shops/search', { params });
-      setShops(res.data.data);
-    } catch (err) { console.error(err); }
+      setShops(res.data.data || []);
+    } catch (e) { console.error(e); }
     finally { setLoading(false); }
   };
 
+  const displayed = filterStatus === 'open'
+    ? shops.filter(s => s.currentStatus === 'OPEN')
+    : shops;
+
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
-      <div className="mb-5">
-        <button onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-gray-500 hover:text-green-900
-                     mb-3 text-sm font-medium transition">
-          <ArrowLeft size={18} /> Back
-        </button>
-        <h1 className="text-xl font-bold text-gray-800">📍 {village || 'All India'}</h1>
-        <p className="text-sm text-gray-500">{shops.length} shops found</p>
+    <div style={{ background: 'var(--bg)', minHeight: '100vh', paddingBottom: 90 }}>
+
+      {/* ── HEADER ── */}
+      <div style={{
+        background: 'linear-gradient(160deg, #1E7B3B 0%, #2F855A 100%)',
+        padding: '52px 18px 20px',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+          <button onClick={() => navigate(-1)}
+            style={{ background: 'rgba(255,255,255,.15)', border: 'none', borderRadius: 10, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', backdropFilter: 'blur(8px)' }}>
+            <ArrowLeft size={18} color="white" />
+          </button>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 18, fontWeight: 800, color: 'white' }}>
+              {village || 'All India'}
+            </div>
+            <div style={{ fontSize: 12, color: 'rgba(255,255,255,.65)', marginTop: 2 }}>
+              {loading ? 'Loading...' : `${displayed.length} shops found`}
+            </div>
+          </div>
+          <button onClick={() => setFilterOpen(f => !f)}
+            style={{ background: 'rgba(255,255,255,.15)', border: 'none', borderRadius: 10, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+            <SlidersHorizontal size={16} color="white" />
+          </button>
+        </div>
+
+        {/* Search */}
+        <form onSubmit={handleSearch}>
+          <div style={{ background: 'white', borderRadius: 12, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10, boxShadow: '0 4px 16px rgba(0,0,0,.15)' }}>
+            <Search size={16} color="var(--text-3)" />
+            <input
+              value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
+              placeholder="Search shops, products..."
+              style={{ flex: 1, border: 'none', outline: 'none', fontSize: 13, color: 'var(--text)', background: 'transparent', fontFamily: 'inherit' }}
+            />
+            {searchTerm && (
+              <button type="submit" style={{ background: 'var(--primary)', color: 'white', border: 'none', borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                Go
+              </button>
+            )}
+          </div>
+        </form>
+
+        {/* Filter strip (open/closed) */}
+        {filterOpen && (
+          <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+            {['all', 'open'].map(f => (
+              <button key={f} onClick={() => setFilterStatus(f)}
+                style={{
+                  padding: '6px 16px', borderRadius: 100, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
+                  background: filterStatus === f ? 'white' : 'rgba(255,255,255,.15)',
+                  color: filterStatus === f ? 'var(--primary)' : 'white',
+                  border: 'none',
+                }}>
+                {f === 'all' ? '🏪 All' : '🟢 Open Now'}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
-      <form onSubmit={handleSearch} className="flex gap-2 mb-5">
-        <div className="flex-1 relative">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
-                 placeholder="Search shops..."
-                 className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm
-                            focus:outline-none focus:border-green-800" />
+      {/* ── CATEGORY CHIPS ── */}
+      <div style={{ padding: '14px 16px 0' }}>
+        <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }} className="scroll-hide">
+          <button onClick={() => setSelectedCat(null)}
+            style={{
+              flexShrink: 0, padding: '8px 16px', borderRadius: 100, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
+              background: !selectedCat ? 'var(--primary)' : 'var(--card)',
+              color: !selectedCat ? 'white' : 'var(--text-2)',
+              border: !selectedCat ? 'none' : '1.5px solid var(--border)',
+              boxShadow: 'var(--shadow-sm)',
+            }}>
+            🏪 All
+          </button>
+          {categories.map(cat => (
+            <button key={cat.id} onClick={() => setSelectedCat(selectedCat === cat.id ? null : cat.id)}
+              style={{
+                flexShrink: 0, padding: '8px 14px', borderRadius: 100, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+                display: 'flex', alignItems: 'center', gap: 5,
+                background: selectedCat === cat.id ? 'var(--primary)' : 'var(--card)',
+                color: selectedCat === cat.id ? 'white' : 'var(--text-2)',
+                border: selectedCat === cat.id ? 'none' : '1.5px solid var(--border)',
+                boxShadow: 'var(--shadow-sm)',
+              }}>
+              <span>{cat.icon}</span> {cat.name}
+            </button>
+          ))}
         </div>
-        <button type="submit"
-          className="bg-green-900 text-white px-4 py-2.5 rounded-xl text-sm font-medium
-                     hover:bg-green-950 transition">
-          Search
-        </button>
-      </form>
-
-      <div className="flex gap-2 overflow-x-auto pb-2 mb-5">
-        <button onClick={() => setSelectedCategory(null)}
-          className={`flex flex-col items-center gap-1 p-3 rounded-xl border-2 transition min-w-[72px]
-            ${!selectedCategory ? 'border-green-800 bg-green-50 text-green-950'
-                                : 'border-gray-200 bg-white text-gray-600'}`}>
-          <span className="text-2xl">🏪</span>
-          <span className="text-xs font-medium">All</span>
-        </button>
-        {categories.map((cat) => (
-          <CategoryCard key={cat.id} category={cat}
-            isSelected={selectedCategory === cat.id}
-            onClick={() => setSelectedCategory(selectedCategory === cat.id ? null : cat.id)} />
-        ))}
       </div>
 
-      {loading ? <LoadingSpinner /> : shops.length === 0 ? (
-        <div className="text-center py-16 text-gray-500">
-          <div className="text-4xl mb-3">🏪</div>
-          <p>No shops found.</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {shops.map((shop) => <ShopCard key={shop.id} shop={shop} />)}
-        </div>
-      )}
+      {/* ── RESULTS ── */}
+      <div style={{ padding: '14px 16px 0' }}>
+        {loading ? (
+          <LoadingSpinner />
+        ) : displayed.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '60px 24px', background: 'var(--card)', borderRadius: 16, border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}>
+            <div style={{ fontSize: 48, marginBottom: 12 }}>🏪</div>
+            <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text)' }}>No shops found</div>
+            <div style={{ fontSize: 13, color: 'var(--text-3)', marginTop: 6 }}>Try a different search or category</div>
+            <button onClick={() => { setSelectedCat(null); setSearchTerm(''); fetchShops(); }}
+              style={{ marginTop: 16, background: 'var(--primary)', color: 'white', border: 'none', borderRadius: 100, padding: '10px 24px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+              Clear filters
+            </button>
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
+            {displayed.map(shop => <ShopCard key={shop.id} shop={shop} />)}
+          </div>
+        )}
+      </div>
+
     </div>
   );
 };
