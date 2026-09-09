@@ -66,13 +66,21 @@ const RegisterPage = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  // Fetch districts on mount
+  // Fetch districts on mount — retry once if slow (Render free tier cold start)
   useEffect(() => {
-    fetch(`${LOC_API}/districts`)
-      .then(r => r.json())
-      .then(d => setDistricts(d.data || []))
-      .catch(() => {})
-      .finally(() => setLocLoading(false));
+    const load = (attempt = 1) => {
+      fetch(`${LOC_API}/districts`)
+        .then(r => r.json())
+        .then(d => {
+          const data = d.data || [];
+          if (data.length === 0 && attempt < 3) { setTimeout(() => load(attempt + 1), 4000); return; }
+          setDistricts(data);
+        })
+        .catch(() => { if (attempt < 3) setTimeout(() => load(attempt + 1), 5000); })
+        .finally(() => { if (attempt >= 3) setLocLoading(false); });
+      if (attempt === 1) setTimeout(() => setLocLoading(false), 2000);
+    };
+    load();
   }, []);
 
   // Fetch mandals when district changes
